@@ -1,0 +1,10 @@
+C:\Users\stitc\Documents\GitHub\VTKParser\VTKParser\VTKParser\obj\Debug\VTKParser.csproj.AssemblyReference.cache
+C:\Users\stitc\Documents\GitHub\VTKParser\VTKParser\VTKParser\obj\Debug\VTKParser.csproj.CoreCompileInputs.cache
+C:\Users\stitc\Documents\GitHub\VTKParser\VTKParser\VTKParser\bin\Debug\VTKParser.exe.config
+C:\Users\stitc\Documents\GitHub\VTKParser\VTKParser\VTKParser\bin\Debug\VTKParser.exe
+C:\Users\stitc\Documents\GitHub\VTKParser\VTKParser\VTKParser\bin\Debug\VTKParser.pdb
+C:\Users\stitc\Documents\GitHub\VTKParser\VTKParser\VTKParser\bin\Debug\SharpDX.dll
+C:\Users\stitc\Documents\GitHub\VTKParser\VTKParser\VTKParser\bin\Debug\SharpDX.pdb
+C:\Users\stitc\Documents\GitHub\VTKParser\VTKParser\VTKParser\obj\Debug\VTKParser.csproj.CopyComplete
+C:\Users\stitc\Documents\GitHub\VTKParser\VTKParser\VTKParser\obj\Debug\VTKParser.exe
+C:\Users\stitc\Documents\GitHub\VTKParser\VTKParser\VTKParser\obj\Debug\VTKParser.pdb
