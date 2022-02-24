@@ -77,7 +77,6 @@ namespace VTKParser
             RECTILINEAR_GRID,
             FIELD
         }
-        public static readonly string[] DataSetStructureArr = { "None", "STRUCTURED_POINTS", "STRUCTURED_GRID", "UNSTRUCTURED_GRID", "POLYDATA", "RECTILINEAR_GRID", "FIELD" };
 
         public ValueType HeaderType { get; set; } = ValueType.None;
         public CompressorType CompressType { get; set; } = CompressorType.None;
@@ -146,26 +145,20 @@ namespace VTKParser
             }//set title
             {
                 string data_save_format_info = raw_data_line_format[2];
-                if (String.Compare(data_save_format_info, "ASCII") == 0)
-                {
-                    SaveFormatType = DataSaveFormat.ASCII;
-                }
-                else
-                {
-                    SaveFormatType = DataSaveFormat.binary;
-                }
+                SaveFormatType = (DataSaveFormat)Enum.Parse(typeof(DataSaveFormat), data_save_format_info);
+                //if (String.Compare(data_save_format_info, "ASCII") == 0)
+                //{
+                //    SaveFormatType = DataSaveFormat.ASCII;
+                //}
+                //else
+                //{
+                //    SaveFormatType = DataSaveFormat.binary;
+                //}
             }//set SaveFormatType
             {
-                string data_set_structure_info = ((raw_data_line_format[3]).Split(new char[] { ' ' }))[1];
-                int i = 0;
-                foreach (string element in DataSetStructureArr)
-                {
-                    if (String.Compare(element, data_set_structure_info) == 0)
-                    {
-                        SetStructureType = (DataSetStructure)i;
-                    }
-                    ++i;
-                }
+                string data_set_structure_info = ((raw_data_line_format[3]).Split(new char[] { ' ' }))[1];//в троке два слова dataset и нужное, берем второе
+                SetStructureType = (DataSetStructure)Enum.Parse(typeof(DataSetStructure), data_set_structure_info);
+
             }//set SetStructureType
         }
         public void RawDataProcess()
