@@ -5,9 +5,9 @@ namespace PetroGM.DataIO.VTK
     class VTKDataArray
     {
         //Show reader how to interpret data. If ValueType is None this 
-        public VTUBase.ValueType Type { get; set; } = VTUBase.ValueType.None;
-        public VTUBase.DataSaveFormat SaveFormat { get; set; } = VTUBase.DataSaveFormat.none;
-        public VTUBase.DataType DatType { get; set; } = VTUBase.DataType.None;
+        public VTKParser.VTKParser.ValueType Type { get; set; } = VTKParser.VTKParser.ValueType.None;
+        public VTKParser.VTKParser.DataSaveFormat SaveFormat { get; set; } = VTKParser.VTKParser.DataSaveFormat.None;
+        public VTKParser.VTKParser.DataType DatType { get; set; } = VTKParser.VTKParser.DataType.None;
         /// <summary>
         /// Size of data to read. It has default value -1 if it's not defined
         /// </summary>

@@ -21,19 +21,9 @@ namespace VTKParser
             raw,
             base64
         }
-        public enum DataType
-        {
-            None,
-            FieldData,
-            PointData,
-            CellData,
-            Points,
-            Cells
-        }
         #endregion
 
 
-        public List<VTKDataArray> DataArray { get; set; }
 
         #region file_info
         protected string header;
@@ -53,20 +43,6 @@ namespace VTKParser
             ASCII,
             binary
         }
-        public enum ValueType
-        {
-            None,
-            Int8,
-            UInt8,
-            Int16,
-            UInt16,
-            Int32,
-            UInt32,
-            Int64,
-            UInt64,
-            Float32,
-            Float64,
-        }
         public enum DataSetStructure
         {
             None,
@@ -85,8 +61,33 @@ namespace VTKParser
         #endregion
 
         #region data_info
+        public enum DataType
+        {
+            None,
+            FieldData,
+            PointData,
+            CellData,
+            Points,
+            Cells
+        }
+        public enum ValueType
+        {
+            None,
+            Int8,
+            UInt8,
+            Int16,
+            UInt16,
+            Int32,
+            UInt32,
+            Int64,
+            UInt64,
+            Float32,
+            Float64,
+        }
         protected string rawData;
+        protected string[] raw_data_for_processing_line_format;
         protected string outputData;
+        public List<VTKDataArray> DataArray { get; set; }
 
         public EncodingType EncodType { get; set; } = EncodingType.none;
         public long NumberOfPoints { get; set; } = 0;
@@ -132,6 +133,55 @@ namespace VTKParser
                 Console.WriteLine(e);
             }
         }
+        protected  T[] String_To_Numbers_Parse<T> (in string data, in string remove_text)//, out T[] output)
+        {
+            string data1 = ((data).Remove(0, remove_text.Length)).Trim();
+            string[] data1arr = data1.Split(new char[] { ' ' });
+            T[] output = new T[data1arr.Length];
+            for (int i = 0; i < data1arr.Length; ++i)
+            {
+                output[i] = (T)Convert.ChangeType(data1arr[i], typeof(T));
+            }
+            return output;
+        }
+        protected void Structured_Points_Initialization()
+        {
+            string[] data = this.raw_data_for_processing_line_format;
+            int linecounter = 0;
+            string dimensions_name = "DIMENSIONS";
+            int[] dimensions;
+            dimensions = this.String_To_Numbers_Parse<int>(data[linecounter], dimensions_name);//, out dimensions);
+            ++linecounter;
+            string spacing_name = "SPACING";
+            int[] spacing;
+            if (data[linecounter].StartsWith("ASPECT_RATIO"))
+            {
+                spacing = this.String_To_Numbers_Parse<int>(data[linecounter], "ASPECT_RATIO");//, out aspect_ratio);
+                spacing_name = "ASPECT_RATIO ";
+            }
+            else 
+            {
+                spacing = this.String_To_Numbers_Parse<int>(data[linecounter], "SPACING");
+            }
+            ++linecounter;
+            string origin_name = "ORIGIN";
+            int[] origin;
+            origin = this.String_To_Numbers_Parse<int>(data[linecounter], origin_name);
+            ++linecounter;
+            string point_data_name = "POINT_DATA";
+            int[] point_data;
+            point_data = this.String_To_Numbers_Parse<int>(data[linecounter], point_data_name);
+            Console.WriteLine();
+            //{
+            //    string dim = ((data[0]).Remove(0, "DIMENSIONS ".Length)).Trim();
+            //    string[] dimarr = dim.Split(new char[] { ' ' });
+            //    dimensions = new int[dimarr.Length];
+            //    for (int i = 0; i < dimarr.Length; ++i)
+            //    {
+            //        dimensions[i] = Convert.ToInt32(dimarr[i]);
+            //    }
+            //}// dimensions parse
+        }
         protected void DataInitialization()//проинициализировать прочитать там заголовок, описание,определить какие там данные 
         {
             string[] raw_data_line_format = this.rawData.Split(new char[] { '\n' });
@@ -146,20 +196,39 @@ namespace VTKParser
             {
                 string data_save_format_info = raw_data_line_format[2];
                 SaveFormatType = (DataSaveFormat)Enum.Parse(typeof(DataSaveFormat), data_save_format_info);
-                //if (String.Compare(data_save_format_info, "ASCII") == 0)
-                //{
-                //    SaveFormatType = DataSaveFormat.ASCII;
-                //}
-                //else
-                //{
-                //    SaveFormatType = DataSaveFormat.binary;
-                //}
             }//set SaveFormatType
             {
                 string data_set_structure_info = ((raw_data_line_format[3]).Split(new char[] { ' ' }))[1];//в троке два слова dataset и нужное, берем второе
                 SetStructureType = (DataSetStructure)Enum.Parse(typeof(DataSetStructure), data_set_structure_info);
 
             }//set SetStructureType
+            // теперь надоработать со списком DataArray помещать в него инфу там всякие point cells по листам
+            //сначала посчитать ключевые слова в файле, так мы поймем сколько будет ячеек у листа
+            this.raw_data_for_processing_line_format = new string[raw_data_line_format.Length - 4];
+            Array.Copy(raw_data_line_format, 4, this.raw_data_for_processing_line_format, 0, raw_data_for_processing_line_format.Length);
+            switch (SetStructureType)
+            {
+                case DataSetStructure.None:
+                    break;
+                case DataSetStructure.STRUCTURED_POINTS:
+                    {
+                        this.Structured_Points_Initialization();
+                        break;
+                    }
+                case DataSetStructure.STRUCTURED_GRID:
+                    break;
+                case DataSetStructure.UNSTRUCTURED_GRID:
+                    break;
+                case DataSetStructure.POLYDATA:
+                    break;
+                case DataSetStructure.RECTILINEAR_GRID:
+                    break;
+                case DataSetStructure.FIELD:
+                    break;
+                default:
+                    break;
+            }
+
         }
         public void RawDataProcess()
         {
@@ -171,7 +240,7 @@ namespace VTKParser
     {
         static void Main(string[] args)
         {
-            string FilePathR = "C://Users//stitc//Documents//GitHub//VTKParser//VTKParser//examples//beam-quad.vtk";
+            string FilePathR = "C://Users//stitc//Documents//GitHub//VTKParser//VTKParser//examples//structured_points.vtk";
             string FilePathW = "C://Users//stitc//Documents//GitHub//VTKParser//VTKParser//examples//test.vtk";
             VTKParser parser = new VTKParser();
             parser.Read(FilePathR);
