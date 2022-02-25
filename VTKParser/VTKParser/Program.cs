@@ -82,7 +82,7 @@ namespace VTKParser
             Int64,
             UInt64,
             Float32,
-            Float64,
+            Double,
         }
         protected string rawData;
         protected string[] raw_data_for_processing_line_format;
@@ -171,16 +171,126 @@ namespace VTKParser
             string point_data_name = "POINT_DATA";
             int[] point_data;
             point_data = this.String_To_Numbers_Parse<int>(data[linecounter], point_data_name);
-            Console.WriteLine();
-            //{
-            //    string dim = ((data[0]).Remove(0, "DIMENSIONS ".Length)).Trim();
-            //    string[] dimarr = dim.Split(new char[] { ' ' });
-            //    dimensions = new int[dimarr.Length];
-            //    for (int i = 0; i < dimarr.Length; ++i)
-            //    {
-            //        dimensions[i] = Convert.ToInt32(dimarr[i]);
-            //    }
-            //}// dimensions parse
+            //все дальше уже атрибуы идут
+        }
+        protected void Structured_Grid_Initialization() 
+        {
+            string[] data = this.raw_data_for_processing_line_format;
+            int linecounter = 0;
+            string dimensions_name = "DIMENSIONS";
+            int[] dimensions;
+            dimensions = this.String_To_Numbers_Parse<int>(data[linecounter], dimensions_name);//, out dimensions);
+            ++linecounter;
+            VTKDataArray points = new VTKDataArray();
+            points.Name= "POINTS";
+            points.DataSize = Convert.ToInt32((data[linecounter].Split(' '))[1]);
+            Console.WriteLine((ValueType)Enum.Parse(typeof(ValueType), (data[linecounter].Split(' '))[2], ignoreCase:true));
+            points.Type = (ValueType)Enum.Parse(typeof(ValueType), (data[linecounter].Split(' '))[2], ignoreCase: true);
+            //Type T = Type.GetType("Int32");
+            //T[,] arr1 = new T[points.DataSize, dimensions.Length];
+            ++linecounter;
+            object arr;
+            switch (points.Type)
+            {
+                //case ValueType.None:
+                //    {
+                //        SByte[,] arr = null;
+                //        break;
+                //    }
+                //case ValueType.Int8:
+                //    {
+                //        arr = new SByte[points.DataSize, dimensions.Length];
+                //        for (int i = 0; i < points.DataSize; ++i)
+                //        {
+                //            var temp = this.String_To_Numbers_Parse<SByte>(data[linecounter], "");
+                //            for (int k = 0; k < dimensions.Length; k++)
+                //            {
+                //                ((SByte[,])arr)[i, k] = temp[k];
+                //            }
+                //            ++linecounter;
+                //        }
+                //        break;
+                //    }
+                //case ValueType.UInt8:
+                //    {
+                //        Byte[,] arr = new Byte[points.DataSize, dimensions.Length];
+                //        break;
+                //    }
+                //case ValueType.Int16:
+                //    {
+                //        Int16[,] arr = new Int16[points.DataSize, dimensions.Length];
+                //        break;
+                //    }
+                //case ValueType.UInt16:
+                //    {
+                //        UInt16[,] arr = new UInt16[points.DataSize, dimensions.Length];
+                //        break;
+                //    }
+                //case ValueType.Int32:
+                //    {
+                //        Int32[,] arr = new Int32[points.DataSize, dimensions.Length];
+                //        break;
+                //    }
+                //case ValueType.UInt32:
+                //    {
+                //        UInt32[,] arr = new UInt32[points.DataSize, dimensions.Length];
+                //        break;
+                //    }
+                //case ValueType.Int64:
+                //    {
+                //        Int64[,] arr = new Int64[points.DataSize, dimensions.Length];
+                //        break;
+                //    }
+                //case ValueType.UInt64:
+                //    {
+                //        UInt64[,] arr = new UInt64[points.DataSize, dimensions.Length];
+                //        break;
+                //    }
+                //case ValueType.Float32:
+                //    {
+                //        float[,] arr = new float[points.DataSize, dimensions.Length];
+                //        break;
+                //    }
+                case ValueType.Double:
+                    {
+                        arr = new double[points.DataSize, dimensions.Length];
+                        for (int i = 0; i < points.DataSize; ++i)
+                        {
+                            var temp = this.String_To_Numbers_Parse<double>(data[linecounter], "");
+                            for (int k = 0; k < dimensions.Length; k++)
+                            {
+                                ((double[,])arr)[i, k] = temp[k];
+                            }
+                            ++linecounter;
+                        }
+                        break;
+                    }
+                default:
+                    {
+                        arr = null;
+                        break;
+                    }
+            }
+            points.Data.Add(arr);
+
+            //points.Data.Add()
+            //points.Data = new (Type)points.Type[points.DataSize, dimensions.Length];
+
+        }
+        protected void Untructured_Grid_Initialization()
+        {
+        }
+        protected void Structured_Polydata_Initialization()
+        {
+        }
+        protected void Structured_Rectilinear_Grid_Initialization()
+        {
+        }
+        protected void Structured_Field_Initialization()
+        {
+        }
+        protected void Attribute_Initialization()
+        { 
         }
         protected void DataInitialization()//проинициализировать прочитать там заголовок, описание,определить какие там данные 
         {
@@ -216,18 +326,34 @@ namespace VTKParser
                         break;
                     }
                 case DataSetStructure.STRUCTURED_GRID:
-                    break;
+                    {
+                        this.Structured_Grid_Initialization();
+                        break;
+                    }
                 case DataSetStructure.UNSTRUCTURED_GRID:
-                    break;
+                    {
+                        this.Untructured_Grid_Initialization();
+                        break;
+                    }
                 case DataSetStructure.POLYDATA:
-                    break;
+                    {
+                        this.Structured_Polydata_Initialization();
+                        break;
+                    }
                 case DataSetStructure.RECTILINEAR_GRID:
-                    break;
+                    {
+                        this.Structured_Rectilinear_Grid_Initialization();
+                        break;
+                    }
                 case DataSetStructure.FIELD:
-                    break;
+                    {
+                        this.Structured_Field_Initialization();
+                        break;
+                    }
                 default:
                     break;
             }
+            this.Attribute_Initialization();
 
         }
         public void RawDataProcess()
@@ -238,10 +364,15 @@ namespace VTKParser
     }
     class Program
     {
+        private T[] returnmass<T>(int n)
+        {
+            T[] arr = new T[n];
+            return arr;
+        }
         static void Main(string[] args)
         {
-            string FilePathR = "C://Users//stitc//Documents//GitHub//VTKParser//VTKParser//examples//structured_points.vtk";
-            string FilePathW = "C://Users//stitc//Documents//GitHub//VTKParser//VTKParser//examples//test.vtk";
+            string FilePathR = "C://Users//stitc//Documents//GitHub//VTKParser//VTKParser//examples//structured_grid.txt";
+            string FilePathW = "C://Users//stitc//Documents//GitHub//VTKParser//VTKParser//examples//test.txt";
             VTKParser parser = new VTKParser();
             parser.Read(FilePathR);
             parser.RawDataProcess();
