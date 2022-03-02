@@ -73,16 +73,16 @@ namespace VTKParser
         public enum ValueType
         {
             None,
-            Int8,
-            UInt8,
-            Int16,
-            UInt16,
-            Int32,
-            UInt32,
-            Int64,
-            UInt64,
-            Float32,
-            Double,
+            Unsigned_char,
+            Char, 
+            Unsigned_short, 
+            Short, 
+            Unsigned_int, 
+            Int,
+            Unsigned_long, 
+            Long,
+            Float,
+            Double
         }
         protected string rawData;
         protected string[] raw_data_for_processing_line_format;
@@ -184,7 +184,7 @@ namespace VTKParser
             VTKDataArray points = new VTKDataArray();
             points.Name= "POINTS";
             points.DataSize = Convert.ToInt32((data[linecounter].Split(' '))[1]);
-            Console.WriteLine((ValueType)Enum.Parse(typeof(ValueType), (data[linecounter].Split(' '))[2], ignoreCase:true));
+            //Console.WriteLine((ValueType)Enum.Parse(typeof(ValueType), (data[linecounter].Split(' '))[2], ignoreCase:true));
             points.Type = (ValueType)Enum.Parse(typeof(ValueType), (data[linecounter].Split(' '))[2], ignoreCase: true);
             //Type T = Type.GetType("Int32");
             //T[,] arr1 = new T[points.DataSize, dimensions.Length];
@@ -282,9 +282,72 @@ namespace VTKParser
         }
         protected void Structured_Polydata_Initialization()
         {
+            string[] data = this.raw_data_for_processing_line_format;
+            int linecounter = 0;
+            VTKDataArray points = new VTKDataArray();
+            points.Name = "POINTS";
+            points.DataSize = Convert.ToInt32((data[linecounter].Split(' '))[1]);
+            points.Type = (ValueType)Enum.Parse(typeof(ValueType), (data[linecounter].Split(' '))[2], ignoreCase: true);
+            ++linecounter;
+            object arr;
+            int dimensions = 3;
+            arr = new double[points.DataSize, dimensions];
+            for (int i = 0; i < points.DataSize; ++i)
+            {
+                var temp = this.String_To_Numbers_Parse<double>(data[linecounter], "");
+                for (int k = 0; k < dimensions; k++)
+                {
+                    ((double[,])arr)[i, k] = temp[k];
+                }
+                ++linecounter;
+            }
+            points.Data.Add(arr);
+            this.DataArray.Add(points);
+            while (linecounter<data.Length-1)
+            {
+                if (data[linecounter].StartsWith("VERTICES") || data[linecounter].StartsWith("LINES") || data[linecounter].StartsWith("POLYGONS") || data[linecounter].StartsWith("TRIANGLE_STRIPS"))
+                {
+                    
+                }
+                ++linecounter;
+            }
+
         }
         protected void Structured_Rectilinear_Grid_Initialization()
         {
+            string[] data = this.raw_data_for_processing_line_format;
+            int linecounter = 0;
+            string dimensions_name = "DIMENSIONS";
+            int[] dimensions;
+            dimensions = this.String_To_Numbers_Parse<int>(data[linecounter], dimensions_name);//, out dimensions);
+            ++linecounter;
+            VTKDataArray xarr = new VTKDataArray();
+            VTKDataArray yarr = new VTKDataArray();
+            VTKDataArray zarr = new VTKDataArray();
+            xarr.Name = "X_COORDINATES";
+            yarr.Name = "Y_COORDINATES";
+            zarr.Name = "Z_COORDINATES";
+
+            xarr.DataSize = Convert.ToInt32((data[linecounter].Split(' '))[1]);
+            ++linecounter;
+            //object Data;//= new double[xarr.DataSize];
+            //Data = this.String_To_Numbers_Parse<double>(data[linecounter], "");
+            xarr.Data.Add(this.String_To_Numbers_Parse<double>(data[linecounter], ""));
+            xarr.Type = (ValueType)Enum.Parse(typeof(ValueType), (data[linecounter].Split(' '))[2], ignoreCase: true);
+
+            ++linecounter;
+            yarr.DataSize = Convert.ToInt32((data[linecounter].Split(' '))[1]);
+            yarr.Type = (ValueType)Enum.Parse(typeof(ValueType), (data[linecounter].Split(' '))[2], ignoreCase: true);
+            ++linecounter;
+            yarr.Data.Add(this.String_To_Numbers_Parse<double>(data[linecounter], ""));
+
+            ++linecounter;
+            zarr.DataSize = Convert.ToInt32((data[linecounter].Split(' '))[1]);
+            zarr.Type = (ValueType)Enum.Parse(typeof(ValueType), (data[linecounter].Split(' '))[2], ignoreCase: true);
+            ++linecounter;
+            zarr.Data.Add(this.String_To_Numbers_Parse<double>(data[linecounter], ""));
+            //Console.ReadKey();
+
         }
         protected void Structured_Field_Initialization()
         {
@@ -371,8 +434,9 @@ namespace VTKParser
         }
         static void Main(string[] args)
         {
-            string FilePathR = "C://Users//stitc//Documents//GitHub//VTKParser//VTKParser//examples//structured_grid.txt";
-            string FilePathW = "C://Users//stitc//Documents//GitHub//VTKParser//VTKParser//examples//test.txt";
+            //string FilePathR = "C://Users//stitc//Documents//GitHub//VTKParser//VTKParser//examples//structured_grid.txt";
+            string FilePathR = "C://Users//stitc//Documents//VTKParser//VTKParser//examples//rectilinear_grid.txt";
+            string FilePathW = "C://Users//stitc//Documents//VTKParser//VTKParser//examples//test.txt";
             VTKParser parser = new VTKParser();
             parser.Read(FilePathR);
             parser.RawDataProcess();
