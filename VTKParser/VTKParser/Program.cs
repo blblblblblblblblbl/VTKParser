@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.IO;
 using PetroGM.DataIO;
 using PetroGM.DataIO.VTK;
+using System.Globalization;
 
 namespace VTKParser
 {
@@ -140,7 +141,16 @@ namespace VTKParser
             T[] output = new T[data1arr.Length];
             for (int i = 0; i < data1arr.Length; ++i)
             {
-                output[i] = (T)Convert.ChangeType(data1arr[i], typeof(T));
+                //output[i] = (T)Convert.ChangeType(data1arr[i], typeof(T));
+                try
+                {
+                    output[i] = (T)Convert.ChangeType(double.Parse(data1arr[i]), typeof(T));
+                }
+                catch (Exception e)
+                {
+                    output[i] = (T)Convert.ChangeType(double.Parse(data1arr[i], CultureInfo.GetCultureInfo("en-US")), typeof(T));
+                }
+                //output[i] = (T)Convert.ChangeType(double.Parse(data1arr[i], CultureInfo.GetCultureInfo("en-US")), typeof(T));
             }
             return output;
         }
@@ -302,18 +312,34 @@ namespace VTKParser
                 ++linecounter;
             }
             points.Data.Add(arr);
+            this.DataArray = new List<VTKDataArray>();
             this.DataArray.Add(points);
             while (linecounter<data.Length-1)
             {
                 if (data[linecounter].StartsWith("VERTICES") || data[linecounter].StartsWith("LINES") || data[linecounter].StartsWith("POLYGONS") || data[linecounter].StartsWith("TRIANGLE_STRIPS"))
                 {
-                    
+                    VTKDataArray temp = new VTKDataArray();
+                    temp.Name = (data[linecounter].Split(' '))[0];
+                    //temp.DataSize = Convert.ToInt32((data[linecounter].Split(' '))[1]);
+                    temp.NumberOfComponents = Convert.ToInt32((data[linecounter].Split(' '))[1]);
+                    temp.DataSize = Convert.ToInt32((data[linecounter].Split(' '))[2]);
+                    double[][] temp_arr = new double[temp.NumberOfComponents][];
+                    //temp.NumberOfComponents = Convert.ToInt32((data[linecounter].Split(' '))[2]);
+                    ++linecounter;
+                    for (int i = 0; i < temp.NumberOfComponents; ++i)
+                    {
+                        temp_arr[i]= this.String_To_Numbers_Parse<double>(data[linecounter], "");
+                        ++linecounter;
+                    }
+                    temp.Data.Add(temp_arr);
+                    this.DataArray.Add(temp);
+                    --linecounter;
                 }
                 ++linecounter;
             }
 
         }
-        protected void Structured_Rectilinear_Grid_Initialization()
+        protected void Rectilinear_Grid_Initialization()
         {
             string[] data = this.raw_data_for_processing_line_format;
             int linecounter = 0;
@@ -405,7 +431,7 @@ namespace VTKParser
                     }
                 case DataSetStructure.RECTILINEAR_GRID:
                     {
-                        this.Structured_Rectilinear_Grid_Initialization();
+                        this.Rectilinear_Grid_Initialization();
                         break;
                     }
                 case DataSetStructure.FIELD:
@@ -435,7 +461,7 @@ namespace VTKParser
         static void Main(string[] args)
         {
             //string FilePathR = "C://Users//stitc//Documents//GitHub//VTKParser//VTKParser//examples//structured_grid.txt";
-            string FilePathR = "C://Users//stitc//Documents//VTKParser//VTKParser//examples//rectilinear_grid.txt";
+            string FilePathR = "C://Users//stitc//Documents//VTKParser//VTKParser//examples//POLYDATA.txt";
             string FilePathW = "C://Users//stitc//Documents//VTKParser//VTKParser//examples//test.txt";
             VTKParser parser = new VTKParser();
             parser.Read(FilePathR);
