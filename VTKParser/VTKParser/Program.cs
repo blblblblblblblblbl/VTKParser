@@ -438,8 +438,38 @@ namespace VTKParser
             //Console.ReadKey();
 
         }
-        protected void Structured_Field_Initialization()
+        protected void Field_Initialization()
         {
+            string[] data = this.raw_data_for_processing_line_format;
+            int linecounter = 0;
+            string dataName = (data[linecounter].Split(' '))[1];
+            int numArrays = Convert.ToInt32((data[linecounter].Split(' '))[2]);
+            ++linecounter;
+            VTKDataArray temp;
+            for (int i = 1; i <= numArrays; ++i)
+            {
+                temp = new VTKDataArray();
+                {
+                    string[] fline = (data[linecounter].Split(' '));
+                    temp.Name = fline[0];
+                    temp.NumberOfComponents = Convert.ToInt32(fline[1]);
+                    temp.NumberOfTuples = Convert.ToInt32(fline[2]);
+                    temp.Type = (ValueType)Enum.Parse(typeof(ValueType), fline[3], ignoreCase: true);
+                }
+                ++linecounter;
+                double[,] temparr = new double[temp.NumberOfTuples, temp.NumberOfComponents];
+                double[] temptuple;
+                for (int k = 0; k < temp.NumberOfTuples; ++k)
+                {
+                    temptuple = this.String_To_Numbers_Parse<double>(data[linecounter], "");
+                    for (int j = 0; j<temptuple.Length; ++j)
+                    {
+                        temparr[k, j] = temptuple[j];
+                    }
+                    ++linecounter;
+                }
+                temp.Data.Add(temparr);
+            }
         }
         protected void Attribute_Initialization()
         { 
@@ -457,18 +487,18 @@ namespace VTKParser
             }//set title
             {
                 string data_save_format_info = raw_data_line_format[2];
-                SaveFormatType = (DataSaveFormat)Enum.Parse(typeof(DataSaveFormat), data_save_format_info);
+                this.SaveFormatType = (DataSaveFormat)Enum.Parse(typeof(DataSaveFormat), data_save_format_info);
             }//set SaveFormatType
             {
                 string data_set_structure_info = ((raw_data_line_format[3]).Split(new char[] { ' ' }))[1];//в троке два слова dataset и нужное, берем второе
-                SetStructureType = (DataSetStructure)Enum.Parse(typeof(DataSetStructure), data_set_structure_info);
+                this.SetStructureType = (DataSetStructure)Enum.Parse(typeof(DataSetStructure), data_set_structure_info);
 
             }//set SetStructureType
             // теперь надоработать со списком DataArray помещать в него инфу там всякие point cells по листам
             //сначала посчитать ключевые слова в файле, так мы поймем сколько будет ячеек у листа
             this.raw_data_for_processing_line_format = new string[raw_data_line_format.Length - 4];
             Array.Copy(raw_data_line_format, 4, this.raw_data_for_processing_line_format, 0, raw_data_for_processing_line_format.Length);
-            switch (SetStructureType)
+            switch (this.SetStructureType)
             {
                 case DataSetStructure.None:
                     break;
@@ -499,7 +529,9 @@ namespace VTKParser
                     }
                 case DataSetStructure.FIELD:
                     {
-                        this.Structured_Field_Initialization();
+                        this.DataArray = new List<VTKDataArray>();
+
+                        this.Field_Initialization();
                         break;
                     }
                 default:
@@ -523,7 +555,7 @@ namespace VTKParser
         }
         static void Main(string[] args)
         {
-            string FilePathR = "C://Users//stitc//Documents//GitHub//VTKParser//VTKParser//examples//POLYDATA.txt";
+            string FilePathR = "C://Users//stitc//Documents//GitHub//VTKParser//VTKParser//examples//field.txt";
             string FilePathW = "C://Users//stitc//Documents//GitHub//VTKParser//VTKParser//examples//test.txt";
             //string FilePathR = "C://Users//stitc//Documents//VTKParser//VTKParser//examples//POLYDATA.txt";
             //string FilePathW = "C://Users//stitc//Documents//VTKParser//VTKParser//examples//test.txt";
