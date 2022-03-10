@@ -4,10 +4,10 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{65F7C209-9851-4906-84F2-AC6ABACD82C9}</ProjectGuid>
+    <ProjectGuid>{29353270-9202-47A0-BFDD-95BFAB456F6A}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <RootNamespace>VTKParser</RootNamespace>
-    <AssemblyName>VTKParser</AssemblyName>
+    <RootNamespace>Empty_Project</RootNamespace>
+    <AssemblyName>Empty_Project</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -33,12 +33,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="SharpDX, Version=4.2.0.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpDX.4.2.0\lib\net45\SharpDX.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Numerics" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -47,19 +43,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BaseParser.cs" />
-    <Compile Include="BaseParserData.cs" />
     <Compile Include="Program.cs" />
-    <Compile Include="ProgramV2.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="VTKBase64Utilities.cs" />
-    <Compile Include="VTKData.cs" />
-    <Compile Include="VTKDataArray.cs" />
-    <Compile Include="VTUBase.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
