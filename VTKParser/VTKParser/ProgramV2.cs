@@ -61,6 +61,23 @@ namespace VTKParser
                 this.spacing_name = value;
             }
         }
+        public void Parse(string[] data)
+        {
+            int linecounter = 0;
+            this.Dimensions = VTKParser.String_To_Numbers_Parse<int>(data[linecounter], "DIMENSIONS");//, out dimensions);
+            ++linecounter;
+            this.Origin = VTKParser.String_To_Numbers_Parse<int>(data[linecounter], "ORIGIN");
+            ++linecounter;
+            if (data[linecounter].StartsWith("ASPECT_RATIO"))
+            {
+                this.Spacing = VTKParser.String_To_Numbers_Parse<int>(data[linecounter], "ASPECT_RATIO");//, out aspect_ratio);
+                this.Spacing_name = "ASPECT_RATIO ";
+            }
+            else
+            {
+                this.Spacing = VTKParser.String_To_Numbers_Parse<int>(data[linecounter], "SPACING");
+            }
+        }
         public string string_data()
         {
             string output = "";
@@ -86,20 +103,17 @@ namespace VTKParser
                 {
                     sspacing += $"{el} ";
                 }
-                output += "SPACING "+sspacing + "\n";
+                output += $"{this.spacing_name} " + sspacing + "\n";
             }
             return output;
-        }
-        public void Parse(string[] data)
-        { 
         }
     }
     class Structured_Grid_Class
 
     {
         private int[] dimensions;
-        public VTKDataArray points = new VTKDataArray();
-        public int[] Dimensions
+        private VTKDataArray points = new VTKDataArray();
+        private int[] Dimensions
         {
             get
             {
@@ -109,6 +123,104 @@ namespace VTKParser
             {
                 this.dimensions = value;
             }
+        }
+        public void Parse(string[] data)
+        {
+            int linecounter = 0;
+            //int[] dimensions;
+            Dimensions = VTKParser.String_To_Numbers_Parse<int>(data[linecounter], "DIMENSIONS");//, out dimensions);
+            ++linecounter;
+            //VTKDataArray points = new VTKDataArray();
+            points.Name = "POINTS";
+            points.NumberOfTuples = Convert.ToInt32((data[linecounter].Split(' '))[1]);//points.DataSize;
+            points.DataSize = points.NumberOfTuples * Dimensions.Length;
+            points.NumberOfComponents = Dimensions.Length;
+            points.Type = (VTKParser.ValueType)Enum.Parse(typeof(VTKParser.ValueType), (data[linecounter].Split(' '))[2], ignoreCase: true);
+            ++linecounter;
+            object arr;
+            switch (points.Type)
+            {
+                //case ValueType.None:
+                //    {
+                //        SByte[,] arr = null;
+                //        break;
+                //    }
+                //case ValueType.Int8:
+                //    {
+                //        arr = new SByte[points.DataSize, dimensions.Length];
+                //        for (int i = 0; i < points.DataSize; ++i)
+                //        {
+                //            var temp = String_To_Numbers_Parse<SByte>(data[linecounter], "");
+                //            for (int k = 0; k < dimensions.Length; k++)
+                //            {
+                //                ((SByte[,])arr)[i, k] = temp[k];
+                //            }
+                //            ++linecounter;
+                //        }
+                //        break;
+                //    }
+                //case ValueType.UInt8:
+                //    {
+                //        Byte[,] arr = new Byte[points.DataSize, dimensions.Length];
+                //        break;
+                //    }
+                //case ValueType.Int16:
+                //    {
+                //        Int16[,] arr = new Int16[points.DataSize, dimensions.Length];
+                //        break;
+                //    }
+                //case ValueType.UInt16:
+                //    {
+                //        UInt16[,] arr = new UInt16[points.DataSize, dimensions.Length];
+                //        break;
+                //    }
+                //case ValueType.Int32:
+                //    {
+                //        Int32[,] arr = new Int32[points.DataSize, dimensions.Length];
+                //        break;
+                //    }
+                //case ValueType.UInt32:
+                //    {
+                //        UInt32[,] arr = new UInt32[points.DataSize, dimensions.Length];
+                //        break;
+                //    }
+                //case ValueType.Int64:
+                //    {
+                //        Int64[,] arr = new Int64[points.DataSize, dimensions.Length];
+                //        break;
+                //    }
+                //case ValueType.UInt64:
+                //    {
+                //        UInt64[,] arr = new UInt64[points.DataSize, dimensions.Length];
+                //        break;
+                //    }
+                //case ValueType.Float32:
+                //    {
+                //        float[,] arr = new float[points.DataSize, dimensions.Length];
+                //        break;
+                //    }
+                case VTKParser.ValueType.Double:
+                    {
+                        arr = new double[points.NumberOfTuples, Dimensions.Length];
+                        for (int i = 0; i < points.NumberOfTuples; ++i)
+                        {
+                            var temp = VTKParser.String_To_Numbers_Parse<double>(data[linecounter], "");
+                            for (int k = 0; k < Dimensions.Length; k++)
+                            {
+                                ((double[,])arr)[i, k] = temp[k];
+                            }
+                            ++linecounter;
+                        }
+                        break;
+                    }
+                default:
+                    {
+                        arr = null;
+                        break;
+                    }
+            }
+            points.Data.Add(arr);
+
         }
         public string string_data()
         {
@@ -138,10 +250,62 @@ namespace VTKParser
     }
     class Unstructured_Grid_Class
     {
-        public List<VTKDataArray> DataArray = new List<VTKDataArray>();
-        public VTKDataArray points = new VTKDataArray();
-        public VTKDataArray cells = new VTKDataArray();
-        public VTKDataArray cell_types = new VTKDataArray();
+        private List<VTKDataArray> DataArray = new List<VTKDataArray>();
+        private VTKDataArray points = new VTKDataArray();
+        private VTKDataArray cells = new VTKDataArray();
+        private VTKDataArray cell_types = new VTKDataArray();
+        public void Parse(string[] data)
+        {
+            int linecounter = 0;
+            {
+                points.Name = "POINTS";
+                points.NumberOfComponents = 3;
+                points.NumberOfTuples = Convert.ToInt32((data[linecounter].Split(' '))[1]);
+                points.DataSize = points.NumberOfComponents * points.NumberOfTuples;
+                points.Type = (VTKParser.ValueType)Enum.Parse(typeof(ValueType), (data[linecounter].Split(' '))[2], ignoreCase: true);
+                ++linecounter;
+                object arr;
+                arr = new double[points.NumberOfTuples, points.NumberOfComponents];
+                for (int i = 0; i < points.NumberOfTuples; ++i)
+                {
+                    var temp = VTKParser.String_To_Numbers_Parse<double>(data[linecounter], "");
+                    for (int k = 0; k < points.NumberOfComponents; k++)
+                    {
+                        ((double[,])arr)[i, k] = temp[k];
+                    }
+                    ++linecounter;
+                }
+                points.Data.Add(arr);
+                DataArray.Add(points);
+            }//points
+            {
+                cells.Name = (data[linecounter].Split(' '))[0];
+                cells.NumberOfTuples = Convert.ToInt32((data[linecounter].Split(' '))[1]);
+                cells.DataSize = Convert.ToInt32((data[linecounter].Split(' '))[2]);
+                double[][] temp_arr = new double[cells.NumberOfTuples][];
+                ++linecounter;
+                for (int i = 0; i < cells.NumberOfTuples; ++i)
+                {
+                    temp_arr[i] = VTKParser.String_To_Numbers_Parse<double>(data[linecounter], "");
+                    ++linecounter;
+                }
+                cells.Data.Add(temp_arr);
+                DataArray.Add(cells);
+            }//cells
+            {
+                cell_types.Name = (data[linecounter].Split(' '))[0];
+                cell_types.NumberOfComponents = Convert.ToInt32((data[linecounter].Split(' '))[1]);
+                int[] cell_types_arr = new int[cell_types.NumberOfComponents];
+                ++linecounter;
+                for (int i = 0; i < cell_types.NumberOfComponents; ++i)
+                {
+                    cell_types_arr[i] = Convert.ToInt32(data[linecounter]);
+                    ++linecounter;
+                }
+                cell_types.Data.Add(cell_types_arr);
+                DataArray.Add(cell_types);
+            }//cell_types
+        }
         public string string_data()
         {
             string output = "";
@@ -187,8 +351,50 @@ namespace VTKParser
     }
     class Polydata_Class
     {
-        public VTKDataArray points = new VTKDataArray();
-        public List<VTKDataArray> DataArray = new List<VTKDataArray>();
+        private VTKDataArray points = new VTKDataArray();
+        private List<VTKDataArray> DataArray = new List<VTKDataArray>();
+        public void Parse(string[] data)
+        {
+            int linecounter = 0;
+            points.Name = "POINTS";
+            points.NumberOfTuples = Convert.ToInt32((data[linecounter].Split(' '))[1]);
+            points.NumberOfComponents = 3;
+            points.Type = (VTKParser.ValueType)Enum.Parse(typeof(ValueType), (data[linecounter].Split(' '))[2], ignoreCase: true);
+            ++linecounter;
+            object arr;
+            arr = new double[points.NumberOfTuples, points.NumberOfComponents];
+            for (int i = 0; i < points.NumberOfTuples; ++i)
+            {
+                var temp = VTKParser.String_To_Numbers_Parse<double>(data[linecounter], "");
+                for (int k = 0; k < points.NumberOfComponents; k++)
+                {
+                    ((double[,])arr)[i, k] = temp[k];
+                }
+                ++linecounter;
+            }
+            points.Data.Add(arr);
+            while (linecounter < data.Length - 1)
+            {
+                if (data[linecounter].StartsWith("VERTICES") || data[linecounter].StartsWith("LINES") || data[linecounter].StartsWith("POLYGONS") || data[linecounter].StartsWith("TRIANGLE_STRIPS"))
+                {
+                    VTKDataArray temp = new VTKDataArray();
+                    temp.Name = (data[linecounter].Split(' '))[0];
+                    temp.NumberOfTuples = Convert.ToInt32((data[linecounter].Split(' '))[1]);
+                    temp.DataSize = Convert.ToInt32((data[linecounter].Split(' '))[2]);
+                    double[][] temp_arr = new double[temp.NumberOfTuples][];
+                    ++linecounter;
+                    for (int i = 0; i < temp.NumberOfTuples; ++i)
+                    {
+                        temp_arr[i] = VTKParser.String_To_Numbers_Parse<double>(data[linecounter], "");
+                        ++linecounter;
+                    }
+                    temp.Data.Add(temp_arr);
+                    DataArray.Add(temp);
+                    --linecounter;
+                }
+                ++linecounter;
+            }
+        }
         public string string_data()
         {
             string output = "";
@@ -231,6 +437,24 @@ namespace VTKParser
     {
         public int[] dimensions;
         public List<VTKDataArray> DataArray = new List<VTKDataArray>();
+        public void Parse(string[] data)
+        {
+            int linecounter = 0;
+            dimensions = VTKParser.String_To_Numbers_Parse<int>(data[linecounter], "DIMENSIONS");
+            ++linecounter;
+            VTKDataArray temp;
+            for (int i = 0; i < 3; ++i)
+            {
+                temp = new VTKDataArray();
+                temp.Name = (data[linecounter].Split(' '))[0];
+                temp.DataSize = Convert.ToInt32((data[linecounter].Split(' '))[1]);
+                temp.Type = (VTKParser.ValueType)Enum.Parse(typeof(VTKParser.ValueType), (data[linecounter].Split(' '))[2], ignoreCase: true);
+                ++linecounter;
+                temp.Data.Add(VTKParser.String_To_Numbers_Parse<double>(data[linecounter], ""));
+                ++linecounter;
+                DataArray.Add(temp);
+            }
+        }
         public string string_data()
         {
             string output = "";
@@ -401,7 +625,7 @@ namespace VTKParser
             this.rawData = String.Join(" ", this.rawData.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries));
             this.rawData = Regex.Replace(this.rawData, @"^\s*\r?\n|\r?\n(?!\s*\S)", "", RegexOptions.Multiline);
         }
-        protected T[] String_To_Numbers_Parse<T>(in string data, in string remove_text)//, out T[] output)
+        public static T[] String_To_Numbers_Parse<T>(in string data, in string remove_text="")//, out T[] output)
         {
             string data1 = ((data).Remove(0, remove_text.Length)).Trim();
             string[] data1arr = data1.Split(new char[] { ' ' });
@@ -433,251 +657,34 @@ namespace VTKParser
         protected void Structured_Points_Initialization()
         {
             Structured_Points_Class dataset = new Structured_Points_Class();
-            string[] data = this.raw_data_for_processing_line_format;
-            int linecounter = 0;
-            dataset.Dimensions = this.String_To_Numbers_Parse<int>(data[linecounter], "DIMENSIONS");//, out dimensions);
-            ++linecounter;
-            dataset.Origin = this.String_To_Numbers_Parse<int>(data[linecounter], "ORIGIN");
-            ++linecounter;
-            if (data[linecounter].StartsWith("ASPECT_RATIO"))
-            {
-                dataset.Spacing = this.String_To_Numbers_Parse<int>(data[linecounter], "ASPECT_RATIO");//, out aspect_ratio);
-                dataset.Spacing_name = "ASPECT_RATIO ";
-            }
-            else
-            {
-                dataset.Spacing = this.String_To_Numbers_Parse<int>(data[linecounter], "SPACING");
-            }
+            dataset.Parse(this.raw_data_for_processing_line_format);
             this.dataset = dataset;
         }
         protected void Structured_Grid_Initialization()
         {
-            string[] data = this.raw_data_for_processing_line_format;
-            int linecounter = 0;
             Structured_Grid_Class dataset = new Structured_Grid_Class();
-            //int[] dimensions;
-            dataset.Dimensions = this.String_To_Numbers_Parse<int>(data[linecounter], "DIMENSIONS");//, out dimensions);
-            ++linecounter;
-            //VTKDataArray points = new VTKDataArray();
-            dataset.points.Name = "POINTS";
-            dataset.points.NumberOfTuples = Convert.ToInt32((data[linecounter].Split(' '))[1]);//dataset.points.DataSize;
-            dataset.points.DataSize = dataset.points.NumberOfTuples* dataset.Dimensions.Length;
-            dataset.points.NumberOfComponents=dataset.Dimensions.Length;
-            dataset.points.Type = (ValueType)Enum.Parse(typeof(ValueType), (data[linecounter].Split(' '))[2], ignoreCase: true);
-            ++linecounter;
-            object arr;
-            switch (dataset.points.Type)
-            {
-                //case ValueType.None:
-                //    {
-                //        SByte[,] arr = null;
-                //        break;
-                //    }
-                //case ValueType.Int8:
-                //    {
-                //        arr = new SByte[points.DataSize, dimensions.Length];
-                //        for (int i = 0; i < points.DataSize; ++i)
-                //        {
-                //            var temp = this.String_To_Numbers_Parse<SByte>(data[linecounter], "");
-                //            for (int k = 0; k < dimensions.Length; k++)
-                //            {
-                //                ((SByte[,])arr)[i, k] = temp[k];
-                //            }
-                //            ++linecounter;
-                //        }
-                //        break;
-                //    }
-                //case ValueType.UInt8:
-                //    {
-                //        Byte[,] arr = new Byte[points.DataSize, dimensions.Length];
-                //        break;
-                //    }
-                //case ValueType.Int16:
-                //    {
-                //        Int16[,] arr = new Int16[points.DataSize, dimensions.Length];
-                //        break;
-                //    }
-                //case ValueType.UInt16:
-                //    {
-                //        UInt16[,] arr = new UInt16[points.DataSize, dimensions.Length];
-                //        break;
-                //    }
-                //case ValueType.Int32:
-                //    {
-                //        Int32[,] arr = new Int32[points.DataSize, dimensions.Length];
-                //        break;
-                //    }
-                //case ValueType.UInt32:
-                //    {
-                //        UInt32[,] arr = new UInt32[points.DataSize, dimensions.Length];
-                //        break;
-                //    }
-                //case ValueType.Int64:
-                //    {
-                //        Int64[,] arr = new Int64[points.DataSize, dimensions.Length];
-                //        break;
-                //    }
-                //case ValueType.UInt64:
-                //    {
-                //        UInt64[,] arr = new UInt64[points.DataSize, dimensions.Length];
-                //        break;
-                //    }
-                //case ValueType.Float32:
-                //    {
-                //        float[,] arr = new float[points.DataSize, dimensions.Length];
-                //        break;
-                //    }
-                case ValueType.Double:
-                    {
-                        arr = new double[dataset.points.NumberOfTuples, dataset.Dimensions.Length];
-                        for (int i = 0; i < dataset.points.NumberOfTuples; ++i)
-                        {
-                            var temp = this.String_To_Numbers_Parse<double>(data[linecounter], "");
-                            for (int k = 0; k < dataset.Dimensions.Length; k++)
-                            {
-                                ((double[,])arr)[i, k] = temp[k];
-                            }
-                            ++linecounter;
-                        }
-                        break;
-                    }
-                default:
-                    {
-                        arr = null;
-                        break;
-                    }
-            }
-            dataset.points.Data.Add(arr);
+            dataset.Parse(this.raw_data_for_processing_line_format);
             this.dataset = dataset;
-            this.outputData = dataset.string_data();
         }
         protected void Untructured_Grid_Initialization()
         {
             Unstructured_Grid_Class dataset = new Unstructured_Grid_Class();
-            string[] data = this.raw_data_for_processing_line_format;
-            int linecounter = 0;
-            {
-                dataset.points.Name = "POINTS";
-                dataset.points.NumberOfComponents = 3;
-                dataset.points.NumberOfTuples = Convert.ToInt32((data[linecounter].Split(' '))[1]);
-                dataset.points.DataSize = dataset.points.NumberOfComponents * dataset.points.NumberOfTuples;
-                dataset.points.Type = (ValueType)Enum.Parse(typeof(ValueType), (data[linecounter].Split(' '))[2], ignoreCase: true);
-                ++linecounter;
-                object arr;
-                arr = new double[dataset.points.NumberOfTuples, dataset.points.NumberOfComponents];
-                for (int i = 0; i < dataset.points.NumberOfTuples; ++i)
-                {
-                    var temp = this.String_To_Numbers_Parse<double>(data[linecounter], "");
-                    for (int k = 0; k < dataset.points.NumberOfComponents; k++)
-                    {
-                        ((double[,])arr)[i, k] = temp[k];
-                    }
-                    ++linecounter;
-                }
-                dataset.points.Data.Add(arr);
-                dataset.DataArray.Add(dataset.points);
-            }//points
-            {
-                dataset.cells.Name = (data[linecounter].Split(' '))[0];
-                dataset.cells.NumberOfTuples = Convert.ToInt32((data[linecounter].Split(' '))[1]);
-                dataset.cells.DataSize = Convert.ToInt32((data[linecounter].Split(' '))[2]);
-                double[][] temp_arr = new double[dataset.cells.NumberOfTuples][];
-                ++linecounter;
-                for (int i = 0; i < dataset.cells.NumberOfTuples; ++i)
-                {
-                    temp_arr[i] = this.String_To_Numbers_Parse<double>(data[linecounter], "");
-                    ++linecounter;
-                }
-                dataset.cells.Data.Add(temp_arr);
-                dataset.DataArray.Add(dataset.cells);
-            }//cells
-            {
-                dataset.cell_types.Name = (data[linecounter].Split(' '))[0];
-                dataset.cell_types.NumberOfComponents = Convert.ToInt32((data[linecounter].Split(' '))[1]);
-                int[] cell_types_arr = new int[dataset.cell_types.NumberOfComponents];
-                ++linecounter;
-                for (int i = 0; i < dataset.cell_types.NumberOfComponents; ++i)
-                {
-                    cell_types_arr[i] = Convert.ToInt32(data[linecounter]);
-                    ++linecounter;
-                }
-                dataset.cell_types.Data.Add(cell_types_arr);
-                dataset.DataArray.Add(dataset.cell_types);
-            }//cell_types
+            dataset.Parse(this.raw_data_for_processing_line_format);
             this.dataset = dataset;
-            //this.outputData = dataset.string_data();
 
         }
         protected void Polydata_Initialization()
         {
-            string[] data = this.raw_data_for_processing_line_format;
-            int linecounter = 0;
-            Polydata_Class dataset = new Polydata_Class(); 
-            dataset.points.Name = "POINTS";
-            dataset.points.NumberOfTuples = Convert.ToInt32((data[linecounter].Split(' '))[1]);
-            dataset.points.NumberOfComponents = 3;
-            dataset.points.Type = (ValueType)Enum.Parse(typeof(ValueType), (data[linecounter].Split(' '))[2], ignoreCase: true);
-            ++linecounter;
-            object arr;
-            arr = new double[dataset.points.NumberOfTuples, dataset.points.NumberOfComponents];
-            for (int i = 0; i < dataset.points.NumberOfTuples; ++i)
-            {
-                var temp = this.String_To_Numbers_Parse<double>(data[linecounter], "");
-                for (int k = 0; k < dataset.points.NumberOfComponents; k++)
-                {
-                    ((double[,])arr)[i, k] = temp[k];
-                }
-                ++linecounter;
-            }
-            dataset.points.Data.Add(arr);
-            //dataset.DataArray = new List<VTKDataArray>();
-            //dataset.DataArray.Add(dataset.points);
-            while (linecounter < data.Length - 1)
-            {
-                if (data[linecounter].StartsWith("VERTICES") || data[linecounter].StartsWith("LINES") || data[linecounter].StartsWith("POLYGONS") || data[linecounter].StartsWith("TRIANGLE_STRIPS"))
-                {
-                    VTKDataArray temp = new VTKDataArray();
-                    temp.Name = (data[linecounter].Split(' '))[0];
-                    temp.NumberOfTuples = Convert.ToInt32((data[linecounter].Split(' '))[1]);
-                    temp.DataSize = Convert.ToInt32((data[linecounter].Split(' '))[2]);
-                    double[][] temp_arr = new double[temp.NumberOfTuples][];
-                    ++linecounter;
-                    for (int i = 0; i < temp.NumberOfTuples; ++i)
-                    {
-                        temp_arr[i] = this.String_To_Numbers_Parse<double>(data[linecounter], "");
-                        ++linecounter;
-                    }
-                    temp.Data.Add(temp_arr);
-                    dataset.DataArray.Add(temp);
-                    --linecounter;
-                }
-                ++linecounter;
-            }
+            Polydata_Class dataset = new Polydata_Class();
+            dataset.Parse(this.raw_data_for_processing_line_format);
             this.dataset = dataset;
-            //this.outputData = dataset.string_data();
 
         }
         protected void Rectilinear_Grid_Initialization()
         {
-            string[] data = this.raw_data_for_processing_line_format;
             Rectilinear_Grid_Class dataset = new Rectilinear_Grid_Class();
-            int linecounter = 0;
-            dataset.dimensions = this.String_To_Numbers_Parse<int>(data[linecounter], "DIMENSIONS");
-            ++linecounter;
-            VTKDataArray temp;
-            for (int i = 0; i < 3; ++i)
-            {
-                temp = new VTKDataArray();
-                temp.Name = (data[linecounter].Split(' '))[0];
-                temp.DataSize = Convert.ToInt32((data[linecounter].Split(' '))[1]);
-                temp.Type = (ValueType)Enum.Parse(typeof(ValueType), (data[linecounter].Split(' '))[2], ignoreCase: true);
-                ++linecounter;
-                temp.Data.Add(this.String_To_Numbers_Parse<double>(data[linecounter], ""));
-                ++linecounter;
-                dataset.DataArray.Add(temp);
-            }
+            dataset.Parse(this.raw_data_for_processing_line_format);
             this.dataset = dataset;
-            //this.outputData = dataset.string_data();
         }
         protected void Field_Initialization()
         {
@@ -702,7 +709,7 @@ namespace VTKParser
                 double[] temptuple;
                 for (int k = 0; k < temp.NumberOfTuples; ++k)
                 {
-                    temptuple = this.String_To_Numbers_Parse<double>(data[linecounter], "");
+                    temptuple = String_To_Numbers_Parse<double>(data[linecounter], "");
                     for (int j = 0; j < temptuple.Length; ++j)
                     {
                         temparr[k, j] = temptuple[j];
@@ -740,7 +747,7 @@ namespace VTKParser
                             double[] temptuple;
                             for (int k = 0; k < temp.NumberOfTuples; ++k)
                             {
-                                temptuple = this.String_To_Numbers_Parse<double>(data[linecounter], "");
+                                temptuple = String_To_Numbers_Parse<double>(data[linecounter], "");
                                 for (int j = 0; j < temptuple.Length; ++j)
                                 {
                                     temparr[k, j] = temptuple[j];
@@ -762,7 +769,7 @@ namespace VTKParser
                             double[] temptuple;
                             for (int k = 0; k < temp.NumberOfTuples; ++k)
                             {
-                                temptuple = this.String_To_Numbers_Parse<double>(data[linecounter], "");
+                                temptuple = String_To_Numbers_Parse<double>(data[linecounter], "");
                                 for (int j = 0; j < temptuple.Length; ++j)
                                 {
                                     temparr[k, j] = temptuple[j];
@@ -784,7 +791,7 @@ namespace VTKParser
                             double[] temptuple;
                             for (int k = 0; k < temp.NumberOfTuples; ++k)
                             {
-                                temptuple = this.String_To_Numbers_Parse<double>(data[linecounter], "");
+                                temptuple = String_To_Numbers_Parse<double>(data[linecounter], "");
                                 for (int j = 0; j < temptuple.Length; ++j)
                                 {
                                     temparr[k, j] = temptuple[j];
@@ -807,7 +814,7 @@ namespace VTKParser
                             double[] temptuple;
                             for (int k = 0; k < temp.NumberOfTuples; ++k)
                             {
-                                temptuple = this.String_To_Numbers_Parse<double>(data[linecounter], "");
+                                temptuple = String_To_Numbers_Parse<double>(data[linecounter], "");
                                 for (int j = 0; j < temptuple.Length; ++j)
                                 {
                                     temparr[k, j] = temptuple[j];
@@ -830,7 +837,7 @@ namespace VTKParser
                             double[] temptuple;
                             for (int k = 0; k < temp.NumberOfTuples; ++k)
                             {
-                                temptuple = this.String_To_Numbers_Parse<double>(data[linecounter], "");
+                                temptuple = String_To_Numbers_Parse<double>(data[linecounter], "");
                                 for (int j = 0; j < temptuple.Length; ++j)
                                 {
                                     temparr[k, j] = temptuple[j];
@@ -853,7 +860,7 @@ namespace VTKParser
                             double[] temptuple;
                             for (int k = 0; k < temp.NumberOfTuples; ++k)
                             {
-                                temptuple = this.String_To_Numbers_Parse<double>(data[linecounter], "");
+                                temptuple = String_To_Numbers_Parse<double>(data[linecounter], "");
                                 for (int j = 0; j < temptuple.Length; ++j)
                                 {
                                     temparr[k, j] = temptuple[j];
@@ -879,7 +886,7 @@ namespace VTKParser
                                 temparr = new double[temp.DataSize, temp.DataSize];
                                 for (int i = 0; i < temp.DataSize; ++i)
                                 {
-                                    temptuple = this.String_To_Numbers_Parse<double>(data[linecounter], "");
+                                    temptuple = String_To_Numbers_Parse<double>(data[linecounter], "");
                                     for (int j = 0; j < temptuple.Length; ++j)
                                     {
                                         temparr[i, j] = temptuple[j];
@@ -994,7 +1001,7 @@ namespace VTKParser
     }
     class ProgramV2
     {
-        private T[] returnmass<T>(int n)
+        static T[] returnmass<T>(int n)
         {
             T[] arr = new T[n];
             return arr;
@@ -1003,7 +1010,7 @@ namespace VTKParser
         {
             //string FilePathR = "C://Users//stitc//Documents//GitHub//VTKParser//VTKParser//examples//field.txt";
             //string FilePathW = "C://Users//stitc//Documents//GitHub//VTKParser//VTKParser//examples//test.txt";
-            string FilePathR = "C://Users//stitc//Documents//VTKParser//VTKParser//examples//rectilinear_grid.txt";
+            string FilePathR = "C://Users//stitc//Documents//VTKParser//VTKParser//examples//structured_points.vtk";
             string FilePathW = "C://Users//stitc//Documents//VTKParser//VTKParser//examples//test.txt";
             VTKParser parser = new VTKParser();
             parser.Read(FilePathR);
