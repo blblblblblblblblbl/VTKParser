@@ -8,6 +8,9 @@ namespace PetroGM.DataIO.VTK
         public VTKParser.VTKParser.ValueType Type { get; set; } = VTKParser.VTKParser.ValueType.None;
         public VTKParser.VTKParser.DataSaveFormat SaveFormat { get; set; } = VTKParser.VTKParser.DataSaveFormat.None;
         public VTKParser.VTKParser.DataType DatType { get; set; } = VTKParser.VTKParser.DataType.None;
+
+        public VTKParser.VTKParser.AttributeType attributeType { get; set; }= VTKParser.VTKParser.AttributeType.None;
+        //public int attribute_data_size { get; set; }
         /// <summary>
         /// Size of data to read. It has default value -1 if it's not defined
         /// </summary>

@@ -490,8 +490,9 @@ namespace VTKParser
         private List<VTKDataArray> DataArray = new List<VTKDataArray>();
         public void Parse(string[] data)
         {
-            int linecounter = 0;
+            int linecounter = 1;
             VTKDataArray temp;
+            int NumberOfTuples= Convert.ToInt32(data[0].Split(' ')[1]);
             while (linecounter < data.Length)
             {
                 switch ((VTKParser.AttributeType)Enum.Parse(typeof(VTKParser.AttributeType), data[linecounter].Split(' ')[0]))
@@ -499,7 +500,8 @@ namespace VTKParser
                     case VTKParser.AttributeType.SCALARS:
                         {
                             temp = new VTKDataArray();
-                            temp.NumberOfTuples = this.DataArray[this.DataArray.Count() - 1].NumberOfTuples;
+                            temp.NumberOfTuples = NumberOfTuples;
+                            temp.attributeType = (VTKParser.AttributeType)Enum.Parse(typeof(VTKParser.AttributeType), data[linecounter].Split(' ')[0]);
                             temp.Name = data[linecounter].Split(' ')[1];
                             temp.Type = (VTKParser.ValueType)Enum.Parse(typeof(VTKParser.ValueType), (data[linecounter].Split(' ')[2]), ignoreCase: true);
                             try
@@ -529,7 +531,8 @@ namespace VTKParser
                     case VTKParser.AttributeType.COLOR_SCALARS:
                         {
                             temp = new VTKDataArray();
-                            temp.NumberOfTuples = this.DataArray[this.DataArray.Count() - 1].NumberOfTuples;
+                            temp.NumberOfTuples = NumberOfTuples;
+                            temp.attributeType = (VTKParser.AttributeType)Enum.Parse(typeof(VTKParser.AttributeType), data[linecounter].Split(' ')[0]);
                             temp.Name = data[linecounter].Split(' ')[1];
                             temp.NumberOfComponents = Convert.ToInt32(data[linecounter].Split(' ')[2]);
                             ++linecounter;
@@ -552,6 +555,7 @@ namespace VTKParser
                         {
                             temp = new VTKDataArray();
                             temp.Name = data[linecounter].Split(' ')[1];
+                            temp.attributeType = (VTKParser.AttributeType)Enum.Parse(typeof(VTKParser.AttributeType), data[linecounter].Split(' ')[0]);
                             temp.NumberOfTuples = Convert.ToInt32(data[linecounter].Split(' ')[2]);
                             temp.NumberOfComponents = 4;
                             ++linecounter;
@@ -574,8 +578,9 @@ namespace VTKParser
                         {
                             temp = new VTKDataArray();
                             temp.Name = data[linecounter].Split(' ')[1];
+                            temp.attributeType = (VTKParser.AttributeType)Enum.Parse(typeof(VTKParser.AttributeType), data[linecounter].Split(' ')[0]);
                             temp.Type = (VTKParser.ValueType)Enum.Parse(typeof(VTKParser.ValueType), (data[linecounter].Split(' ')[2]), ignoreCase: true);
-                            temp.NumberOfTuples = this.DataArray[this.DataArray.Count() - 1].NumberOfTuples;
+                            temp.NumberOfTuples = NumberOfTuples;
                             temp.NumberOfComponents = 3;
                             ++linecounter;
                             double[,] temparr = new double[temp.NumberOfTuples, temp.NumberOfComponents];
@@ -597,8 +602,9 @@ namespace VTKParser
                         {
                             temp = new VTKDataArray();
                             temp.Name = data[linecounter].Split(' ')[1];
+                            temp.attributeType = (VTKParser.AttributeType)Enum.Parse(typeof(VTKParser.AttributeType), data[linecounter].Split(' ')[0]);
                             temp.Type = (VTKParser.ValueType)Enum.Parse(typeof(VTKParser.ValueType), (data[linecounter].Split(' ')[2]), ignoreCase: true);
-                            temp.NumberOfTuples = this.DataArray[this.DataArray.Count() - 1].NumberOfTuples;
+                            temp.NumberOfTuples = NumberOfTuples;
                             temp.NumberOfComponents = 3;
                             ++linecounter;
                             double[,] temparr = new double[temp.NumberOfTuples, temp.NumberOfComponents];
@@ -619,10 +625,11 @@ namespace VTKParser
                     case VTKParser.AttributeType.TEXTURE_COORDINATES:
                         {
                             temp = new VTKDataArray();
-                            temp.NumberOfTuples = this.DataArray[this.DataArray.Count() - 1].NumberOfTuples;
+                            temp.NumberOfTuples = NumberOfTuples;
+                            temp.attributeType = (VTKParser.AttributeType)Enum.Parse(typeof(VTKParser.AttributeType), data[linecounter].Split(' ')[0]);
                             temp.Name = data[linecounter].Split(' ')[1];
                             temp.NumberOfComponents = Convert.ToInt32(data[linecounter].Split(' ')[2]);
-                            temp.Type = (VTKParser.ValueType)Enum.Parse(typeof(ValueType), (data[linecounter].Split(' ')[3]), ignoreCase: true);
+                            temp.Type = (VTKParser.ValueType)Enum.Parse(typeof(VTKParser.ValueType), (data[linecounter].Split(' ')[3]), ignoreCase: true);
                             ++linecounter;
                             double[,] temparr = new double[temp.NumberOfTuples, temp.NumberOfComponents];
                             double[] temptuple;
@@ -642,7 +649,8 @@ namespace VTKParser
                     case VTKParser.AttributeType.TENSORS:
                         {
                             temp = new VTKDataArray();
-                            temp.NumberOfTuples = this.DataArray[this.DataArray.Count() - 1].NumberOfTuples;
+                            temp.NumberOfTuples = NumberOfTuples;
+                            temp.attributeType = (VTKParser.AttributeType)Enum.Parse(typeof(VTKParser.AttributeType), data[linecounter].Split(' ')[0]);
                             temp.Name = data[linecounter].Split(' ')[1];
                             temp.Type = (VTKParser.ValueType)Enum.Parse(typeof(VTKParser.ValueType), (data[linecounter].Split(' ')[2]), ignoreCase: true);
                             ++linecounter;
@@ -669,7 +677,7 @@ namespace VTKParser
                         }
                     case VTKParser.AttributeType.FIELD:
                         {
-                            
+                            //temp.attributeType = (VTKParser.AttributeType)Enum.Parse(typeof(VTKParser.AttributeType), data[linecounter].Split(' ')[0]);
                             field_name = (data[linecounter].Split(' '))[1];
                             field_num_arrays = Convert.ToInt32((data[linecounter].Split(' '))[2]);
                             ++linecounter;
@@ -710,6 +718,127 @@ namespace VTKParser
         public string string_data()
         {
             string output = "";
+            string temp;
+            for (int i = 0; i < DataArray.Count; ++i)
+            {
+                temp = "";
+                VTKParser.AttributeType attributeType = DataArray[i].attributeType;
+                switch (attributeType)
+                {
+                    case VTKParser.AttributeType.SCALARS:
+                        {
+                            temp += "SCALARS" + " " + $"{DataArray[i].Name}" + " " + $"{DataArray[i].NumberOfComponents}" + "\n";
+                            for (int kst = 0; kst < DataArray[i].NumberOfTuples; ++kst)
+                            {
+                                for (int kcl = 0; kcl < DataArray[i].NumberOfComponents; ++kcl)
+                                {
+                                    temp += $"{((double[,])(DataArray[i].Data[0]))[kst, kcl]} ";
+                                }
+                                temp.Trim();
+                                temp += "\n";
+                            }
+                            break;
+                        }
+                    case VTKParser.AttributeType.COLOR_SCALARS:
+                        {
+                            temp += "SCALARS" + " " + $"{DataArray[i].Name}" + " " + $"{DataArray[i].NumberOfComponents}" + "\n";
+                            for (int kst = 0; kst < DataArray[i].NumberOfTuples; ++kst)
+                            {
+                                for (int kcl = 0; kcl < DataArray[i].NumberOfComponents; ++kcl)
+                                {
+                                    temp += $"{((double[,])(DataArray[i].Data[0]))[kst, kcl]} ";
+                                }
+                                temp.Trim();
+                                temp += "\n";
+                            }
+                            break;
+                        }
+                    case VTKParser.AttributeType.LOOKUP_TABLE:
+                        {
+                            temp += "LOOKUP_TABLE" + " " + $"{DataArray[i].Name}" + " " + $"{DataArray[i].NumberOfTuples}"+"\n";
+                            for (int kst = 0; kst < DataArray[i].NumberOfTuples; ++kst)
+                            {
+                                for (int kcl = 0; kcl < DataArray[i].NumberOfComponents; ++kcl)
+                                {
+                                    temp += $"{((double[,])(DataArray[i].Data[0]))[kst,kcl]} ";
+                                }
+                                temp.Trim();
+                                temp += "\n";
+                            }
+                            break;
+                        }
+                    case VTKParser.AttributeType.VECTORS:
+                        {
+                            temp += "VECTORS" + " " + $"{DataArray[i].Name}" + " " + $"{DataArray[i].Type}" + "\n";
+                            for (int kst = 0; kst < DataArray[i].NumberOfTuples; ++kst)
+                            {
+                                for (int kcl = 0; kcl < DataArray[i].NumberOfComponents; ++kcl)
+                                {
+                                    temp += $"{((double[,])(DataArray[i].Data[0]))[kst, kcl]} ";
+                                }
+                                temp.Trim();
+                                temp += "\n";
+                            }
+                            break;
+                        }
+                    case VTKParser.AttributeType.NORMALS:
+                        {
+                            temp += "NORMALS" + " " + $"{DataArray[i].Name}" + " " + $"{DataArray[i].Type}" + "\n";
+                            for (int kst = 0; kst < DataArray[i].NumberOfTuples; ++kst)
+                            {
+                                for (int kcl = 0; kcl < DataArray[i].NumberOfComponents; ++kcl)
+                                {
+                                    temp += $"{((double[,])(DataArray[i].Data[0]))[kst, kcl]} ";
+                                }
+                                temp.Trim();
+                                temp += "\n";
+                            }
+                            break;
+                        }
+                    case VTKParser.AttributeType.TEXTURE_COORDINATES:
+                        {
+                            temp += "TEXTURE_COORDINATES" + " " + $"{DataArray[i].Name}" + " " +$"{DataArray[i].NumberOfComponents}" + " "+$"{DataArray[i].Type}".ToLower() + "\n";
+                            for (int kst = 0; kst < DataArray[i].NumberOfTuples; ++kst)
+                            {
+                                for (int kcl = 0; kcl < DataArray[i].NumberOfComponents; ++kcl)
+                                {
+                                    temp += $"{((double[,])(DataArray[i].Data[0]))[kst, kcl]} ";
+                                }
+                                temp.Trim();
+                                temp += "\n";
+                            }
+                            break;
+                        }
+                    case VTKParser.AttributeType.TENSORS:
+                        {
+                            temp += "TENSORS" + " " + $"{DataArray[i].Name}" + " " + $"{DataArray[i].Type}" + "\n";
+                            for (int k = 0; k < DataArray[i].Data.Count; ++k)
+                            {
+                                for (int kst = 0; kst < DataArray[i].DataSize; ++kst)
+                                {
+                                    for (int kcl = 0; kcl < DataArray[i].DataSize; ++kcl)
+                                    {
+                                        temp += $"{((double[,])(DataArray[i].Data[k]))[kst, kcl]} ";
+                                    }
+                                    temp.Trim();
+                                    temp += "\n";
+                                }
+                                //temp += "\n";
+                            }
+                            break;
+                        }
+                    case VTKParser.AttributeType.FIELD:
+                        {
+
+                            break;
+                        }
+                    default:
+                        {
+                            break;
+                        }
+                }
+                output += temp;
+            }
             return output;
         }
 
@@ -790,7 +919,8 @@ namespace VTKParser
         }
         public enum AttributeType
         {
-            SCALARS = 1,
+            None,
+            SCALARS,
             COLOR_SCALARS,
             LOOKUP_TABLE,
             VECTORS,
@@ -996,7 +1126,7 @@ namespace VTKParser
             }
 
             this.raw_data_file_info_line_format = new string[file_info_lines];
-            this.raw_data_attribute_line_format = new string[raw_data_line_format.Length - (attribute_line + 1)];
+            this.raw_data_attribute_line_format = new string[raw_data_line_format.Length - attribute_line];
             this.raw_data_for_processing_line_format = new string[raw_data_line_format.Length - this.raw_data_attribute_line_format.Length-this.raw_data_file_info_line_format.Length];
 
             Array.Copy(raw_data_line_format, 0, this.raw_data_file_info_line_format, 0, this.raw_data_file_info_line_format.Length);
@@ -1009,7 +1139,8 @@ namespace VTKParser
             this.DataInitialization();
             this.File_Info_Process();
             this.Data_Process();
-            //this.Attribute_Process();
+            this.Attribute_Process();
+            this.outputData = attributes.string_data();
         }
     }
     class ProgramV2
@@ -1023,7 +1154,7 @@ namespace VTKParser
         {
             //string FilePathR = "C://Users//stitc//Documents//GitHub//VTKParser//VTKParser//examples//field.txt";
             //string FilePathW = "C://Users//stitc//Documents//GitHub//VTKParser//VTKParser//examples//test.txt";
-            string FilePathR = "C://Users//stitc//Documents//VTKParser//VTKParser//examples//structured_points.vtk";
+            string FilePathR = "C://Users//stitc//Documents//VTKParser//VTKParser//examples//attributes.txt";
             string FilePathW = "C://Users//stitc//Documents//VTKParser//VTKParser//examples//test.txt";
             VTKParser parser = new VTKParser();
             parser.Read(FilePathR);
