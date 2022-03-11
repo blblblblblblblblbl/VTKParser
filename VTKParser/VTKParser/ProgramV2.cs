@@ -435,8 +435,8 @@ namespace VTKParser
     }
     class Rectilinear_Grid_Class
     {
-        public int[] dimensions;
-        public List<VTKDataArray> DataArray = new List<VTKDataArray>();
+        private int[] dimensions;
+        private List<VTKDataArray> DataArray = new List<VTKDataArray>();
         public void Parse(string[] data)
         {
             int linecounter = 0;
@@ -482,6 +482,237 @@ namespace VTKParser
             }
             return output;
         }
+    }
+    class Attributes_Class
+    {
+        string field_name;
+        int field_num_arrays;
+        private List<VTKDataArray> DataArray = new List<VTKDataArray>();
+        public void Parse(string[] data)
+        {
+            int linecounter = 0;
+            VTKDataArray temp;
+            while (linecounter < data.Length)
+            {
+                switch ((VTKParser.AttributeType)Enum.Parse(typeof(VTKParser.AttributeType), data[linecounter].Split(' ')[0]))
+                {
+                    case VTKParser.AttributeType.SCALARS:
+                        {
+                            temp = new VTKDataArray();
+                            temp.NumberOfTuples = this.DataArray[this.DataArray.Count() - 1].NumberOfTuples;
+                            temp.Name = data[linecounter].Split(' ')[1];
+                            temp.Type = (VTKParser.ValueType)Enum.Parse(typeof(VTKParser.ValueType), (data[linecounter].Split(' ')[2]), ignoreCase: true);
+                            try
+                            {
+                                temp.NumberOfComponents = Convert.ToInt32(data[linecounter].Split(' ')[3]);
+                            }
+                            catch (Exception e)
+                            {
+                                temp.NumberOfComponents = 1;
+                            }
+                            ++linecounter;
+                            double[,] temparr = new double[temp.NumberOfTuples, temp.NumberOfComponents];
+                            double[] temptuple;
+                            for (int k = 0; k < temp.NumberOfTuples; ++k)
+                            {
+                                temptuple = VTKParser.String_To_Numbers_Parse<double>(data[linecounter], "");
+                                for (int j = 0; j < temptuple.Length; ++j)
+                                {
+                                    temparr[k, j] = temptuple[j];
+                                }
+                                ++linecounter;
+                            }
+                            temp.Data.Add(temparr);
+                            this.DataArray.Add(temp);
+                            break;
+                        }
+                    case VTKParser.AttributeType.COLOR_SCALARS:
+                        {
+                            temp = new VTKDataArray();
+                            temp.NumberOfTuples = this.DataArray[this.DataArray.Count() - 1].NumberOfTuples;
+                            temp.Name = data[linecounter].Split(' ')[1];
+                            temp.NumberOfComponents = Convert.ToInt32(data[linecounter].Split(' ')[2]);
+                            ++linecounter;
+                            double[,] temparr = new double[temp.NumberOfTuples, temp.NumberOfComponents];
+                            double[] temptuple;
+                            for (int k = 0; k < temp.NumberOfTuples; ++k)
+                            {
+                                temptuple = VTKParser.String_To_Numbers_Parse<double>(data[linecounter], "");
+                                for (int j = 0; j < temptuple.Length; ++j)
+                                {
+                                    temparr[k, j] = temptuple[j];
+                                }
+                                ++linecounter;
+                            }
+                            temp.Data.Add(temparr);
+                            this.DataArray.Add(temp);
+                            break;
+                        }
+                    case VTKParser.AttributeType.LOOKUP_TABLE:
+                        {
+                            temp = new VTKDataArray();
+                            temp.Name = data[linecounter].Split(' ')[1];
+                            temp.NumberOfTuples = Convert.ToInt32(data[linecounter].Split(' ')[2]);
+                            temp.NumberOfComponents = 4;
+                            ++linecounter;
+                            double[,] temparr = new double[temp.NumberOfTuples, temp.NumberOfComponents];
+                            double[] temptuple;
+                            for (int k = 0; k < temp.NumberOfTuples; ++k)
+                            {
+                                temptuple = VTKParser.String_To_Numbers_Parse<double>(data[linecounter], "");
+                                for (int j = 0; j < temptuple.Length; ++j)
+                                {
+                                    temparr[k, j] = temptuple[j];
+                                }
+                                ++linecounter;
+                            }
+                            temp.Data.Add(temparr);
+                            this.DataArray.Add(temp);
+                            break;
+                        }
+                    case VTKParser.AttributeType.VECTORS:
+                        {
+                            temp = new VTKDataArray();
+                            temp.Name = data[linecounter].Split(' ')[1];
+                            temp.Type = (VTKParser.ValueType)Enum.Parse(typeof(VTKParser.ValueType), (data[linecounter].Split(' ')[2]), ignoreCase: true);
+                            temp.NumberOfTuples = this.DataArray[this.DataArray.Count() - 1].NumberOfTuples;
+                            temp.NumberOfComponents = 3;
+                            ++linecounter;
+                            double[,] temparr = new double[temp.NumberOfTuples, temp.NumberOfComponents];
+                            double[] temptuple;
+                            for (int k = 0; k < temp.NumberOfTuples; ++k)
+                            {
+                                temptuple = VTKParser.String_To_Numbers_Parse<double>(data[linecounter], "");
+                                for (int j = 0; j < temptuple.Length; ++j)
+                                {
+                                    temparr[k, j] = temptuple[j];
+                                }
+                                ++linecounter;
+                            }
+                            temp.Data.Add(temparr);
+                            this.DataArray.Add(temp);
+                            break;
+                        }
+                    case VTKParser.AttributeType.NORMALS:
+                        {
+                            temp = new VTKDataArray();
+                            temp.Name = data[linecounter].Split(' ')[1];
+                            temp.Type = (VTKParser.ValueType)Enum.Parse(typeof(VTKParser.ValueType), (data[linecounter].Split(' ')[2]), ignoreCase: true);
+                            temp.NumberOfTuples = this.DataArray[this.DataArray.Count() - 1].NumberOfTuples;
+                            temp.NumberOfComponents = 3;
+                            ++linecounter;
+                            double[,] temparr = new double[temp.NumberOfTuples, temp.NumberOfComponents];
+                            double[] temptuple;
+                            for (int k = 0; k < temp.NumberOfTuples; ++k)
+                            {
+                                temptuple = VTKParser.String_To_Numbers_Parse<double>(data[linecounter], "");
+                                for (int j = 0; j < temptuple.Length; ++j)
+                                {
+                                    temparr[k, j] = temptuple[j];
+                                }
+                                ++linecounter;
+                            }
+                            temp.Data.Add(temparr);
+                            this.DataArray.Add(temp);
+                            break;
+                        }
+                    case VTKParser.AttributeType.TEXTURE_COORDINATES:
+                        {
+                            temp = new VTKDataArray();
+                            temp.NumberOfTuples = this.DataArray[this.DataArray.Count() - 1].NumberOfTuples;
+                            temp.Name = data[linecounter].Split(' ')[1];
+                            temp.NumberOfComponents = Convert.ToInt32(data[linecounter].Split(' ')[2]);
+                            temp.Type = (VTKParser.ValueType)Enum.Parse(typeof(ValueType), (data[linecounter].Split(' ')[3]), ignoreCase: true);
+                            ++linecounter;
+                            double[,] temparr = new double[temp.NumberOfTuples, temp.NumberOfComponents];
+                            double[] temptuple;
+                            for (int k = 0; k < temp.NumberOfTuples; ++k)
+                            {
+                                temptuple = VTKParser.String_To_Numbers_Parse<double>(data[linecounter], "");
+                                for (int j = 0; j < temptuple.Length; ++j)
+                                {
+                                    temparr[k, j] = temptuple[j];
+                                }
+                                ++linecounter;
+                            }
+                            temp.Data.Add(temparr);
+                            this.DataArray.Add(temp);
+                            break;
+                        }
+                    case VTKParser.AttributeType.TENSORS:
+                        {
+                            temp = new VTKDataArray();
+                            temp.NumberOfTuples = this.DataArray[this.DataArray.Count() - 1].NumberOfTuples;
+                            temp.Name = data[linecounter].Split(' ')[1];
+                            temp.Type = (VTKParser.ValueType)Enum.Parse(typeof(VTKParser.ValueType), (data[linecounter].Split(' ')[2]), ignoreCase: true);
+                            ++linecounter;
+                            temp.DataSize = 3;
+                            double[,] temparr;
+                            double[] temptuple;
+                            for (int k = 0; k < temp.NumberOfTuples; ++k)
+                            {
+                                temparr = new double[temp.DataSize, temp.DataSize];
+                                for (int i = 0; i < temp.DataSize; ++i)
+                                {
+                                    temptuple = VTKParser.String_To_Numbers_Parse<double>(data[linecounter], "");
+                                    for (int j = 0; j < temptuple.Length; ++j)
+                                    {
+                                        temparr[i, j] = temptuple[j];
+                                    }
+                                    ++linecounter;
+                                }
+                                //++linecounter;
+                                temp.Data.Add(temparr);
+                            }
+                            this.DataArray.Add(temp);
+                            break;
+                        }
+                    case VTKParser.AttributeType.FIELD:
+                        {
+                            
+                            field_name = (data[linecounter].Split(' '))[1];
+                            field_num_arrays = Convert.ToInt32((data[linecounter].Split(' '))[2]);
+                            ++linecounter;
+                            for (int i = 1; i <= field_num_arrays; ++i)
+                            {
+                                temp = new VTKDataArray();
+                                {
+                                    string[] fline = (data[linecounter].Split(' '));
+                                    temp.Name = fline[0];
+                                    temp.NumberOfComponents = Convert.ToInt32(fline[1]);
+                                    temp.NumberOfTuples = Convert.ToInt32(fline[2]);
+                                    temp.Type = (VTKParser.ValueType)Enum.Parse(typeof(ValueType), fline[3], ignoreCase: true);
+                                }
+                                ++linecounter;
+                                double[,] temparr = new double[temp.NumberOfTuples, temp.NumberOfComponents];
+                                double[] temptuple;
+                                for (int k = 0; k < temp.NumberOfTuples; ++k)
+                                {
+                                    temptuple = VTKParser.String_To_Numbers_Parse<double>(data[linecounter], "");
+                                    for (int j = 0; j < temptuple.Length; ++j)
+                                    {
+                                        temparr[k, j] = temptuple[j];
+                                    }
+                                    ++linecounter;
+                                }
+                                temp.Data.Add(temparr);
+                            }
+                            break;
+                        }
+                    default:
+                        {
+                            ++linecounter;
+                            break;
+                        }
+                }
+            }
+        }
+        public string string_data()
+        {
+            string output = "";
+            return output;
+        }
+
     }
     class VTKParser : BaseParser
     {
@@ -573,6 +804,7 @@ namespace VTKParser
         protected string[] raw_data_for_processing_line_format;
         protected string[] raw_data_attribute_line_format;
         object dataset;
+        Attributes_Class attributes;
 
         protected string outputData;
         public List<VTKDataArray> DataArray { get; set; }
@@ -686,230 +918,11 @@ namespace VTKParser
             dataset.Parse(this.raw_data_for_processing_line_format);
             this.dataset = dataset;
         }
-        protected void Field_Initialization()
-        {
-            string[] data = this.raw_data_for_processing_line_format;
-            int linecounter = 0;
-            string dataName = (data[linecounter].Split(' '))[1];
-            int numArrays = Convert.ToInt32((data[linecounter].Split(' '))[2]);
-            ++linecounter;
-            VTKDataArray temp;
-            for (int i = 1; i <= numArrays; ++i)
-            {
-                temp = new VTKDataArray();
-                {
-                    string[] fline = (data[linecounter].Split(' '));
-                    temp.Name = fline[0];
-                    temp.NumberOfComponents = Convert.ToInt32(fline[1]);
-                    temp.NumberOfTuples = Convert.ToInt32(fline[2]);
-                    temp.Type = (ValueType)Enum.Parse(typeof(ValueType), fline[3], ignoreCase: true);
-                }
-                ++linecounter;
-                double[,] temparr = new double[temp.NumberOfTuples, temp.NumberOfComponents];
-                double[] temptuple;
-                for (int k = 0; k < temp.NumberOfTuples; ++k)
-                {
-                    temptuple = String_To_Numbers_Parse<double>(data[linecounter], "");
-                    for (int j = 0; j < temptuple.Length; ++j)
-                    {
-                        temparr[k, j] = temptuple[j];
-                    }
-                    ++linecounter;
-                }
-                temp.Data.Add(temparr);
-            }
-        }
         protected void Attribute_Process()
         {
-            string[] data = this.raw_data_attribute_line_format;
-            int linecounter = 0;
-            VTKDataArray temp;
-            while (linecounter < data.Length)
-            {
-                switch ((AttributeType)Enum.Parse(typeof(AttributeType), data[linecounter].Split(' ')[0]))
-                {
-                    case AttributeType.SCALARS:
-                        {
-                            temp = new VTKDataArray();
-                            temp.NumberOfTuples = this.DataArray[this.DataArray.Count() - 1].NumberOfTuples;
-                            temp.Name = data[linecounter].Split(' ')[1];
-                            temp.Type = (ValueType)Enum.Parse(typeof(ValueType), (data[linecounter].Split(' ')[2]), ignoreCase: true);
-                            try
-                            {
-                                temp.NumberOfComponents = Convert.ToInt32(data[linecounter].Split(' ')[3]);
-                            }
-                            catch (Exception e)
-                            {
-                                temp.NumberOfComponents = 1;
-                            }
-                            ++linecounter;
-                            double[,] temparr = new double[temp.NumberOfTuples, temp.NumberOfComponents];
-                            double[] temptuple;
-                            for (int k = 0; k < temp.NumberOfTuples; ++k)
-                            {
-                                temptuple = String_To_Numbers_Parse<double>(data[linecounter], "");
-                                for (int j = 0; j < temptuple.Length; ++j)
-                                {
-                                    temparr[k, j] = temptuple[j];
-                                }
-                                ++linecounter;
-                            }
-                            temp.Data.Add(temparr);
-                            this.DataArray.Add(temp);
-                            break;
-                        }
-                    case AttributeType.COLOR_SCALARS:
-                        {
-                            temp = new VTKDataArray();
-                            temp.NumberOfTuples = this.DataArray[this.DataArray.Count() - 1].NumberOfTuples;
-                            temp.Name = data[linecounter].Split(' ')[1];
-                            temp.NumberOfComponents = Convert.ToInt32(data[linecounter].Split(' ')[2]);
-                            ++linecounter;
-                            double[,] temparr = new double[temp.NumberOfTuples, temp.NumberOfComponents];
-                            double[] temptuple;
-                            for (int k = 0; k < temp.NumberOfTuples; ++k)
-                            {
-                                temptuple = String_To_Numbers_Parse<double>(data[linecounter], "");
-                                for (int j = 0; j < temptuple.Length; ++j)
-                                {
-                                    temparr[k, j] = temptuple[j];
-                                }
-                                ++linecounter;
-                            }
-                            temp.Data.Add(temparr);
-                            this.DataArray.Add(temp);
-                            break;
-                        }
-                    case AttributeType.LOOKUP_TABLE:
-                        {
-                            temp = new VTKDataArray();
-                            temp.Name = data[linecounter].Split(' ')[1];
-                            temp.NumberOfTuples = Convert.ToInt32(data[linecounter].Split(' ')[2]);
-                            temp.NumberOfComponents = 4;
-                            ++linecounter;
-                            double[,] temparr = new double[temp.NumberOfTuples, temp.NumberOfComponents];
-                            double[] temptuple;
-                            for (int k = 0; k < temp.NumberOfTuples; ++k)
-                            {
-                                temptuple = String_To_Numbers_Parse<double>(data[linecounter], "");
-                                for (int j = 0; j < temptuple.Length; ++j)
-                                {
-                                    temparr[k, j] = temptuple[j];
-                                }
-                                ++linecounter;
-                            }
-                            temp.Data.Add(temparr);
-                            this.DataArray.Add(temp);
-                            break;
-                        }
-                    case AttributeType.VECTORS:
-                        {
-                            temp = new VTKDataArray();
-                            temp.Name = data[linecounter].Split(' ')[1];
-                            temp.Type = (ValueType)Enum.Parse(typeof(ValueType), (data[linecounter].Split(' ')[2]), ignoreCase: true);
-                            temp.NumberOfTuples = this.DataArray[this.DataArray.Count() - 1].NumberOfTuples;
-                            temp.NumberOfComponents = 3;
-                            ++linecounter;
-                            double[,] temparr = new double[temp.NumberOfTuples, temp.NumberOfComponents];
-                            double[] temptuple;
-                            for (int k = 0; k < temp.NumberOfTuples; ++k)
-                            {
-                                temptuple = String_To_Numbers_Parse<double>(data[linecounter], "");
-                                for (int j = 0; j < temptuple.Length; ++j)
-                                {
-                                    temparr[k, j] = temptuple[j];
-                                }
-                                ++linecounter;
-                            }
-                            temp.Data.Add(temparr);
-                            this.DataArray.Add(temp);
-                            break;
-                        }
-                    case AttributeType.NORMALS:
-                        {
-                            temp = new VTKDataArray();
-                            temp.Name = data[linecounter].Split(' ')[1];
-                            temp.Type = (ValueType)Enum.Parse(typeof(ValueType), (data[linecounter].Split(' ')[2]), ignoreCase: true);
-                            temp.NumberOfTuples = this.DataArray[this.DataArray.Count() - 1].NumberOfTuples;
-                            temp.NumberOfComponents = 3;
-                            ++linecounter;
-                            double[,] temparr = new double[temp.NumberOfTuples, temp.NumberOfComponents];
-                            double[] temptuple;
-                            for (int k = 0; k < temp.NumberOfTuples; ++k)
-                            {
-                                temptuple = String_To_Numbers_Parse<double>(data[linecounter], "");
-                                for (int j = 0; j < temptuple.Length; ++j)
-                                {
-                                    temparr[k, j] = temptuple[j];
-                                }
-                                ++linecounter;
-                            }
-                            temp.Data.Add(temparr);
-                            this.DataArray.Add(temp);
-                            break;
-                        }
-                    case AttributeType.TEXTURE_COORDINATES:
-                        {
-                            temp = new VTKDataArray();
-                            temp.NumberOfTuples = this.DataArray[this.DataArray.Count() - 1].NumberOfTuples;
-                            temp.Name = data[linecounter].Split(' ')[1];
-                            temp.NumberOfComponents = Convert.ToInt32(data[linecounter].Split(' ')[2]);
-                            temp.Type = (ValueType)Enum.Parse(typeof(ValueType), (data[linecounter].Split(' ')[3]), ignoreCase: true);
-                            ++linecounter;
-                            double[,] temparr = new double[temp.NumberOfTuples, temp.NumberOfComponents];
-                            double[] temptuple;
-                            for (int k = 0; k < temp.NumberOfTuples; ++k)
-                            {
-                                temptuple = String_To_Numbers_Parse<double>(data[linecounter], "");
-                                for (int j = 0; j < temptuple.Length; ++j)
-                                {
-                                    temparr[k, j] = temptuple[j];
-                                }
-                                ++linecounter;
-                            }
-                            temp.Data.Add(temparr);
-                            this.DataArray.Add(temp);
-                            break;
-                        }
-                    case AttributeType.TENSORS:
-                        {
-                            temp = new VTKDataArray();
-                            temp.NumberOfTuples = this.DataArray[this.DataArray.Count() - 1].NumberOfTuples;
-                            temp.Name = data[linecounter].Split(' ')[1];
-                            temp.Type = (ValueType)Enum.Parse(typeof(ValueType), (data[linecounter].Split(' ')[2]), ignoreCase: true);
-                            ++linecounter;
-                            temp.DataSize = 3;
-                            double[,] temparr;
-                            double[] temptuple;
-                            for (int k = 0; k < temp.NumberOfTuples; ++k)
-                            {
-                                temparr = new double[temp.DataSize, temp.DataSize];
-                                for (int i = 0; i < temp.DataSize; ++i)
-                                {
-                                    temptuple = String_To_Numbers_Parse<double>(data[linecounter], "");
-                                    for (int j = 0; j < temptuple.Length; ++j)
-                                    {
-                                        temparr[i, j] = temptuple[j];
-                                    }
-                                    ++linecounter;
-                                }
-                                //++linecounter;
-                                temp.Data.Add(temparr);
-                            }
-                            this.DataArray.Add(temp);
-                            break;
-                        }
-                    case AttributeType.FIELD:
-                        {
-                            break;
-                        }
-                    default:
-                        {
-                            ++linecounter;
-                            break;
-                        }
-                }
-            }
+            Attributes_Class attributes = new Attributes_Class();
+            attributes.Parse(this.raw_data_attribute_line_format);
+            this.attributes = attributes;
         }
         protected void File_Info_Process()
         {
