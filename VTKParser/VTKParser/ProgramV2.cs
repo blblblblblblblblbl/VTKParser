@@ -485,8 +485,8 @@ namespace VTKParser
     }
     class Attributes_Class
     {
-        string field_name;
-        int field_num_arrays;
+        //string field_name;
+        //int field_num_arrays;
         private List<VTKDataArray> DataArray = new List<VTKDataArray>();
         public void Parse(string[] data)
         {
@@ -677,9 +677,11 @@ namespace VTKParser
                         }
                     case VTKParser.AttributeType.FIELD:
                         {
-                            //temp.attributeType = (VTKParser.AttributeType)Enum.Parse(typeof(VTKParser.AttributeType), data[linecounter].Split(' ')[0]);
-                            field_name = (data[linecounter].Split(' '))[1];
-                            field_num_arrays = Convert.ToInt32((data[linecounter].Split(' '))[2]);
+                            // здесь я сначала создаю vtkdataarray запоминаю переменные для него потом в него кладу в data еще лист vtkdataarray а потом в data array добаляю temp который уже является field
+                            string field_name = (data[linecounter].Split(' '))[1];
+                            VTKParser.AttributeType attributeType = (VTKParser.AttributeType)Enum.Parse(typeof(VTKParser.AttributeType), data[linecounter].Split(' ')[0]);
+                            int field_num_arrays = Convert.ToInt32((data[linecounter].Split(' '))[2]);
+                            List<VTKDataArray> field_list = new List<VTKDataArray>();
                             ++linecounter;
                             for (int i = 1; i <= field_num_arrays; ++i)
                             {
@@ -703,8 +705,14 @@ namespace VTKParser
                                     }
                                     ++linecounter;
                                 }
-                                temp.Data.Add(temparr);
+                                field_list.Add(temp);
                             }
+                            temp = new VTKDataArray();
+                            temp.Data.Add(field_list);
+                            temp.Name = field_name;
+                            temp.DataSize = field_num_arrays;
+                            temp.attributeType = attributeType;
+                            DataArray.Add(temp);
                             break;
                         }
                     default:
@@ -829,7 +837,7 @@ namespace VTKParser
                         }
                     case VTKParser.AttributeType.FIELD:
                         {
-
+                            //temp+=
                             break;
                         }
                     default:
@@ -1140,7 +1148,18 @@ namespace VTKParser
             this.File_Info_Process();
             this.Data_Process();
             this.Attribute_Process();
-            this.outputData = attributes.string_data();
+            //this.outputData = attributes.string_data();
+        }
+        public string File_Info()
+        {
+            string output = "";
+            output += this.header + this.title + this.SaveFormatType+"\n" + this.SetStructureType + "\n";
+            return output;
+        }
+        public void Output(string FilePathW) 
+        {
+            this.outputData = File_Info() + attributes.string_data();
+            Write(FilePathW);
         }
     }
     class ProgramV2
@@ -1159,7 +1178,8 @@ namespace VTKParser
             VTKParser parser = new VTKParser();
             parser.Read(FilePathR);
             parser.RawDataProcess();
-            parser.Write(FilePathW);
+            //parser.Write(FilePathW);
+            parser.Output(FilePathW);
             Console.ReadKey();
         }
     }
