@@ -691,7 +691,7 @@ namespace VTKParser
                                     temp.Name = fline[0];
                                     temp.NumberOfComponents = Convert.ToInt32(fline[1]);
                                     temp.NumberOfTuples = Convert.ToInt32(fline[2]);
-                                    temp.Type = (VTKParser.ValueType)Enum.Parse(typeof(ValueType), fline[3], ignoreCase: true);
+                                    temp.Type = (VTKParser.ValueType)Enum.Parse(typeof(VTKParser.ValueType), fline[3], ignoreCase: true);
                                 }
                                 ++linecounter;
                                 double[,] temparr = new double[temp.NumberOfTuples, temp.NumberOfComponents];
@@ -705,6 +705,7 @@ namespace VTKParser
                                     }
                                     ++linecounter;
                                 }
+                                temp.Data.Add(temparr);
                                 field_list.Add(temp);
                             }
                             temp = new VTKDataArray();
@@ -837,7 +838,21 @@ namespace VTKParser
                         }
                     case VTKParser.AttributeType.FIELD:
                         {
-                            //temp+=
+                            temp += $"{attributeType} " + $"{DataArray[i].Name} " + $"{DataArray[i].DataSize}\n";
+                            List<VTKDataArray> field_list = (List<VTKDataArray>)(DataArray[i].Data[0]);
+                            for (int counter = 0; counter < DataArray[i].DataSize; ++counter)
+                            {
+                                temp += $"{field_list[counter].Name} " + $"{field_list[counter].NumberOfComponents} " + $"{field_list[counter].NumberOfTuples} " + $"{field_list[counter].Type}\n".ToLower();
+                                for (int kst = 0; kst < field_list[counter].NumberOfTuples; ++kst)
+                                {
+                                    for (int kcl = 0; kcl < field_list[counter].NumberOfComponents; ++kcl)
+                                    {
+                                        temp += $"{((double[,])(field_list[counter].Data[0]))[kst, kcl]} ";
+                                    }
+                                    temp.Trim();
+                                    temp += "\n";
+                                }
+                            }
                             break;
                         }
                     default:
@@ -1173,7 +1188,7 @@ namespace VTKParser
         {
             //string FilePathR = "C://Users//stitc//Documents//GitHub//VTKParser//VTKParser//examples//field.txt";
             //string FilePathW = "C://Users//stitc//Documents//GitHub//VTKParser//VTKParser//examples//test.txt";
-            string FilePathR = "C://Users//stitc//Documents//VTKParser//VTKParser//examples//attributes.txt";
+            string FilePathR = "C://Users//stitc//Documents//VTKParser//VTKParser//examples//field.txt";
             string FilePathW = "C://Users//stitc//Documents//VTKParser//VTKParser//examples//test.txt";
             VTKParser parser = new VTKParser();
             parser.Read(FilePathR);
