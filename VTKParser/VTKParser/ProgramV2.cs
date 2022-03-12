@@ -11,7 +11,12 @@ using System.Text.RegularExpressions;
 
 namespace VTKParser
 {
-    class Structured_Points_Class
+    class dataset_class
+    {
+        public virtual void Parse(string[] data) { }
+        public virtual string string_data() { return ""; }
+    }
+    class Structured_Points_Class:dataset_class
     {
         private int[] dimensions;
         private int[] spacing;
@@ -61,7 +66,7 @@ namespace VTKParser
                 this.spacing_name = value;
             }
         }
-        public void Parse(string[] data)
+        public override void Parse(string[] data)
         {
             int linecounter = 0;
             this.Dimensions = VTKParser.String_To_Numbers_Parse<int>(data[linecounter], "DIMENSIONS");//, out dimensions);
@@ -78,7 +83,7 @@ namespace VTKParser
                 this.Spacing = VTKParser.String_To_Numbers_Parse<int>(data[linecounter], "SPACING");
             }
         }
-        public string string_data()
+        public override string string_data()
         {
             string output = "";
             {
@@ -108,7 +113,7 @@ namespace VTKParser
             return output;
         }
     }
-    class Structured_Grid_Class
+    class Structured_Grid_Class : dataset_class
 
     {
         private int[] dimensions;
@@ -124,7 +129,7 @@ namespace VTKParser
                 this.dimensions = value;
             }
         }
-        public void Parse(string[] data)
+        public override void Parse(string[] data)
         {
             int linecounter = 0;
             //int[] dimensions;
@@ -222,7 +227,7 @@ namespace VTKParser
             points.Data.Add(arr);
 
         }
-        public string string_data()
+        public override string string_data()
         {
             string output="";
             {
@@ -248,13 +253,13 @@ namespace VTKParser
             return output;
         }
     }
-    class Unstructured_Grid_Class
+    class Unstructured_Grid_Class : dataset_class
     {
         private List<VTKDataArray> DataArray = new List<VTKDataArray>();
         private VTKDataArray points = new VTKDataArray();
         private VTKDataArray cells = new VTKDataArray();
         private VTKDataArray cell_types = new VTKDataArray();
-        public void Parse(string[] data)
+        public override void Parse(string[] data)
         {
             int linecounter = 0;
             {
@@ -262,7 +267,7 @@ namespace VTKParser
                 points.NumberOfComponents = 3;
                 points.NumberOfTuples = Convert.ToInt32((data[linecounter].Split(' '))[1]);
                 points.DataSize = points.NumberOfComponents * points.NumberOfTuples;
-                points.Type = (VTKParser.ValueType)Enum.Parse(typeof(ValueType), (data[linecounter].Split(' '))[2], ignoreCase: true);
+                points.Type = (VTKParser.ValueType)Enum.Parse(typeof(VTKParser.ValueType), (data[linecounter].Split(' '))[2], ignoreCase: true);
                 ++linecounter;
                 object arr;
                 arr = new double[points.NumberOfTuples, points.NumberOfComponents];
@@ -306,7 +311,7 @@ namespace VTKParser
                 DataArray.Add(cell_types);
             }//cell_types
         }
-        public string string_data()
+        public override string string_data()
         {
             string output = "";
             {
@@ -349,17 +354,17 @@ namespace VTKParser
             return output;
         }
     }
-    class Polydata_Class
+    class Polydata_Class : dataset_class
     {
         private VTKDataArray points = new VTKDataArray();
         private List<VTKDataArray> DataArray = new List<VTKDataArray>();
-        public void Parse(string[] data)
+        public override void Parse(string[] data)
         {
             int linecounter = 0;
             points.Name = "POINTS";
             points.NumberOfTuples = Convert.ToInt32((data[linecounter].Split(' '))[1]);
             points.NumberOfComponents = 3;
-            points.Type = (VTKParser.ValueType)Enum.Parse(typeof(ValueType), (data[linecounter].Split(' '))[2], ignoreCase: true);
+            points.Type = (VTKParser.ValueType)Enum.Parse(typeof(VTKParser.ValueType), (data[linecounter].Split(' '))[2], ignoreCase: true);
             ++linecounter;
             object arr;
             arr = new double[points.NumberOfTuples, points.NumberOfComponents];
@@ -395,7 +400,7 @@ namespace VTKParser
                 ++linecounter;
             }
         }
-        public string string_data()
+        public override string string_data()
         {
             string output = "";
             {
@@ -433,11 +438,11 @@ namespace VTKParser
             return output;
         }
     }
-    class Rectilinear_Grid_Class
+    class Rectilinear_Grid_Class : dataset_class
     {
         private int[] dimensions;
         private List<VTKDataArray> DataArray = new List<VTKDataArray>();
-        public void Parse(string[] data)
+        public override void Parse(string[] data)
         {
             int linecounter = 0;
             dimensions = VTKParser.String_To_Numbers_Parse<int>(data[linecounter], "DIMENSIONS");
@@ -455,7 +460,7 @@ namespace VTKParser
                 DataArray.Add(temp);
             }
         }
-        public string string_data()
+        public override string string_data()
         {
             string output = "";
             {
@@ -736,7 +741,8 @@ namespace VTKParser
                 {
                     case VTKParser.AttributeType.SCALARS:
                         {
-                            temp += "SCALARS" + " " + $"{DataArray[i].Name}" + " " + $"{DataArray[i].NumberOfComponents}" + "\n";
+                            string NumberOfComponents = DataArray[i].NumberOfComponents == 1 ? "" : $"{DataArray[i].NumberOfComponents}";
+                            temp += "SCALARS" + " " + $"{DataArray[i].Name}" + " " + $"{DataArray[i].Type} ".ToLower() + NumberOfComponents + "\n";
                             for (int kst = 0; kst < DataArray[i].NumberOfTuples; ++kst)
                             {
                                 for (int kcl = 0; kcl < DataArray[i].NumberOfComponents; ++kcl)
@@ -778,7 +784,7 @@ namespace VTKParser
                         }
                     case VTKParser.AttributeType.VECTORS:
                         {
-                            temp += "VECTORS" + " " + $"{DataArray[i].Name}" + " " + $"{DataArray[i].Type}" + "\n";
+                            temp += "VECTORS" + " " + $"{DataArray[i].Name}" + " " + $"{DataArray[i].Type}".ToLower() + "\n";
                             for (int kst = 0; kst < DataArray[i].NumberOfTuples; ++kst)
                             {
                                 for (int kcl = 0; kcl < DataArray[i].NumberOfComponents; ++kcl)
@@ -792,7 +798,7 @@ namespace VTKParser
                         }
                     case VTKParser.AttributeType.NORMALS:
                         {
-                            temp += "NORMALS" + " " + $"{DataArray[i].Name}" + " " + $"{DataArray[i].Type}" + "\n";
+                            temp += "NORMALS" + " " + $"{DataArray[i].Name}" + " " + $"{DataArray[i].Type}".ToLower() + "\n";
                             for (int kst = 0; kst < DataArray[i].NumberOfTuples; ++kst)
                             {
                                 for (int kcl = 0; kcl < DataArray[i].NumberOfComponents; ++kcl)
@@ -820,7 +826,7 @@ namespace VTKParser
                         }
                     case VTKParser.AttributeType.TENSORS:
                         {
-                            temp += "TENSORS" + " " + $"{DataArray[i].Name}" + " " + $"{DataArray[i].Type}" + "\n";
+                            temp += "TENSORS" + " " + $"{DataArray[i].Name}" + " " + $"{DataArray[i].Type}".ToLower() + "\n";
                             for (int k = 0; k < DataArray[i].Data.Count; ++k)
                             {
                                 for (int kst = 0; kst < DataArray[i].DataSize; ++kst)
@@ -956,7 +962,7 @@ namespace VTKParser
         protected string[] raw_data_file_info_line_format;
         protected string[] raw_data_for_processing_line_format;
         protected string[] raw_data_attribute_line_format;
-        object dataset;
+        dataset_class dataset;
         Attributes_Class attributes;
 
         protected string outputData;
@@ -1173,7 +1179,7 @@ namespace VTKParser
         }
         public void Output(string FilePathW) 
         {
-            this.outputData = File_Info() + attributes.string_data();
+            this.outputData = File_Info()+ dataset.string_data() + attributes.string_data();
             Write(FilePathW);
         }
     }
@@ -1188,7 +1194,7 @@ namespace VTKParser
         {
             //string FilePathR = "C://Users//stitc//Documents//GitHub//VTKParser//VTKParser//examples//field.txt";
             //string FilePathW = "C://Users//stitc//Documents//GitHub//VTKParser//VTKParser//examples//test.txt";
-            string FilePathR = "C://Users//stitc//Documents//VTKParser//VTKParser//examples//field.txt";
+            string FilePathR = "C://Users//stitc//Documents//VTKParser//VTKParser//examples//1.txt";
             string FilePathW = "C://Users//stitc//Documents//VTKParser//VTKParser//examples//test.txt";
             VTKParser parser = new VTKParser();
             parser.Read(FilePathR);
