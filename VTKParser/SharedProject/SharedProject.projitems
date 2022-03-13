@@ -9,5 +9,15 @@
     <Import_RootNamespace>SharedProject</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Attributes.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BaseParser.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DataSet.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PolyData.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RectilinearGrid.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)StructuredGrid.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)StructuredPoints.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)UnstructuredGrid.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)VTKDataArray.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)VTKParser.cs" />
   </ItemGroup>
 </Project>

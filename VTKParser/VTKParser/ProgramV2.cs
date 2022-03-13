@@ -518,6 +518,8 @@ namespace VTKParser
                                 temp.NumberOfComponents = 1;
                             }
                             ++linecounter;
+
+                            ++linecounter;//еще строка из-за lookup table
                             double[,] temparr = new double[temp.NumberOfTuples, temp.NumberOfComponents];
                             double[] temptuple;
                             for (int k = 0; k < temp.NumberOfTuples; ++k)
@@ -1194,7 +1196,7 @@ namespace VTKParser
         {
             //string FilePathR = "C://Users//stitc//Documents//GitHub//VTKParser//VTKParser//examples//field.txt";
             //string FilePathW = "C://Users//stitc//Documents//GitHub//VTKParser//VTKParser//examples//test.txt";
-            string FilePathR = "C://Users//stitc//Documents//VTKParser//VTKParser//examples//1.txt";
+            string FilePathR = "C://Users//stitc//Documents//VTKParser//VTKParser//examples//beam-hex.vtk";
             string FilePathW = "C://Users//stitc//Documents//VTKParser//VTKParser//examples//test.txt";
             VTKParser parser = new VTKParser();
             parser.Read(FilePathR);
