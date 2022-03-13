@@ -1,0 +1,7 @@
+C:\Users\stitc\Documents\GitHub\VTKParser\VTKParser\Empty_Project\obj\Debug\Empty_Project.csproj.AssemblyReference.cache
+C:\Users\stitc\Documents\GitHub\VTKParser\VTKParser\Empty_Project\obj\Debug\Empty_Project.csproj.CoreCompileInputs.cache
+C:\Users\stitc\Documents\GitHub\VTKParser\VTKParser\Empty_Project\bin\Debug\Empty_Project.exe.config
+C:\Users\stitc\Documents\GitHub\VTKParser\VTKParser\Empty_Project\bin\Debug\Empty_Project.exe
+C:\Users\stitc\Documents\GitHub\VTKParser\VTKParser\Empty_Project\bin\Debug\Empty_Project.pdb
+C:\Users\stitc\Documents\GitHub\VTKParser\VTKParser\Empty_Project\obj\Debug\Empty_Project.exe
+C:\Users\stitc\Documents\GitHub\VTKParser\VTKParser\Empty_Project\obj\Debug\Empty_Project.pdb

@@ -3,15 +3,15 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Numerics;
-using SharpDX;
+//using SharpDX;
 
 namespace PetroGM.DataIO
 {
-    public class Line
-    {
-        public List<Vector3> points;
-        public string name;
-    }
+    //public class Line
+    //{
+    //    public List<Vector3> points;
+    //    public string name;
+    //}
 
     public abstract class BaseParser
     {

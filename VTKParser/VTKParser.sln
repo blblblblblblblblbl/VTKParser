@@ -9,7 +9,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Empty_Project", "Empty_Proj
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Unit_Test_Project", "Unit_Test_Project\Unit_Test_Project.csproj", "{FE6921A3-A352-460D-B9B8-EEE23561AB3D}"
 EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "SharedProject", "SharedProject\SharedProject.shproj", "{94ACEEFA-0732-48DB-9560-E0A67B81FCCF}"
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "VTKParse", "SharedProject\VTKParse.shproj", "{94ACEEFA-0732-48DB-9560-E0A67B81FCCF}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution

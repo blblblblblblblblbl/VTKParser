@@ -35,7 +35,11 @@ namespace SharedProject
                                 temp.NumberOfComponents = 1;
                             }
                             ++linecounter;
-
+                            bool isLookupTable;//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! опасно если кто-то назовет defaultName
+                            {
+                                string name = data[linecounter].Split(' ')[1];
+                                isLookupTable = name.StartsWith("default");
+                            }
                             ++linecounter;//еще строка из-за lookup table
                             double[,] temparr = new double[temp.NumberOfTuples, temp.NumberOfComponents];
                             double[] temptuple;
@@ -49,9 +53,53 @@ namespace SharedProject
                                 ++linecounter;
                             }
                             temp.Data.Add(temparr);
+                            if (isLookupTable == false)
+                            {
+                                VTKDataArray lookupTable = new VTKDataArray();
+                                lookupTable.Name = data[linecounter].Split(' ')[1];
+                                lookupTable.attributeType = (VTKParser.AttributeType)Enum.Parse(typeof(VTKParser.AttributeType), data[linecounter].Split(' ')[0]);
+                                lookupTable.NumberOfTuples = Convert.ToInt32(data[linecounter].Split(' ')[2]);
+                                lookupTable.NumberOfComponents = 4;
+                                ++linecounter;
+                                temparr = new double[lookupTable.NumberOfTuples, lookupTable.NumberOfComponents];
+                                for (int k = 0; k < lookupTable.NumberOfTuples; ++k)
+                                {
+                                    temptuple = VTKParser.StringToNumbersParse<double>(data[linecounter], "");
+                                    for (int j = 0; j < temptuple.Length; ++j)
+                                    {
+                                        temparr[k, j] = temptuple[j];
+                                    }
+                                    ++linecounter;
+                                }
+                                lookupTable.Data.Add(temparr);
+                                temp.Data.Add(lookupTable);
+                            }
                             this.DataArray.Add(temp);
                             break;
                         }
+                    //case VTKParser.AttributeType.LOOKUP_TABLE:
+                    //    {
+                    //        temp = new VTKDataArray();
+                    //        temp.Name = data[linecounter].Split(' ')[1];
+                    //        temp.attributeType = (VTKParser.AttributeType)Enum.Parse(typeof(VTKParser.AttributeType), data[linecounter].Split(' ')[0]);
+                    //        temp.NumberOfTuples = Convert.ToInt32(data[linecounter].Split(' ')[2]);
+                    //        temp.NumberOfComponents = 4;
+                    //        ++linecounter;
+                    //        double[,] temparr = new double[temp.NumberOfTuples, temp.NumberOfComponents];
+                    //        double[] temptuple;
+                    //        for (int k = 0; k < temp.NumberOfTuples; ++k)
+                    //        {
+                    //            temptuple = VTKParser.StringToNumbersParse<double>(data[linecounter], "");
+                    //            for (int j = 0; j < temptuple.Length; ++j)
+                    //            {
+                    //                temparr[k, j] = temptuple[j];
+                    //            }
+                    //            ++linecounter;
+                    //        }
+                    //        temp.Data.Add(temparr);
+                    //        this.DataArray.Add(temp);
+                    //        break;
+                    //    }
                     case VTKParser.AttributeType.COLOR_SCALARS:
                         {
                             temp = new VTKDataArray();
@@ -59,29 +107,6 @@ namespace SharedProject
                             temp.attributeType = (VTKParser.AttributeType)Enum.Parse(typeof(VTKParser.AttributeType), data[linecounter].Split(' ')[0]);
                             temp.Name = data[linecounter].Split(' ')[1];
                             temp.NumberOfComponents = Convert.ToInt32(data[linecounter].Split(' ')[2]);
-                            ++linecounter;
-                            double[,] temparr = new double[temp.NumberOfTuples, temp.NumberOfComponents];
-                            double[] temptuple;
-                            for (int k = 0; k < temp.NumberOfTuples; ++k)
-                            {
-                                temptuple = VTKParser.StringToNumbersParse<double>(data[linecounter], "");
-                                for (int j = 0; j < temptuple.Length; ++j)
-                                {
-                                    temparr[k, j] = temptuple[j];
-                                }
-                                ++linecounter;
-                            }
-                            temp.Data.Add(temparr);
-                            this.DataArray.Add(temp);
-                            break;
-                        }
-                    case VTKParser.AttributeType.LOOKUP_TABLE:
-                        {
-                            temp = new VTKDataArray();
-                            temp.Name = data[linecounter].Split(' ')[1];
-                            temp.attributeType = (VTKParser.AttributeType)Enum.Parse(typeof(VTKParser.AttributeType), data[linecounter].Split(' ')[0]);
-                            temp.NumberOfTuples = Convert.ToInt32(data[linecounter].Split(' ')[2]);
-                            temp.NumberOfComponents = 4;
                             ++linecounter;
                             double[,] temparr = new double[temp.NumberOfTuples, temp.NumberOfComponents];
                             double[] temptuple;
@@ -262,6 +287,15 @@ namespace SharedProject
                         {
                             string NumberOfComponents = DataArray[i].NumberOfComponents == 1 ? "" : $"{DataArray[i].NumberOfComponents}";
                             temp += "SCALARS" + " " + $"{DataArray[i].Name}" + " " + $"{DataArray[i].Type} ".ToLower() + NumberOfComponents + "\n";
+                            if (DataArray[i].Data.Count > 1)
+                            {
+                                temp += "LOOKUP_TABLE" + " " + $"{((VTKDataArray)DataArray[i].Data[1]).Name}" + "\n";
+                            }
+                            else
+                            {
+                                temp += "LOOKUP_TABLE" + " " + "default" + "\n";
+                            }
+
                             for (int kst = 0; kst < DataArray[i].NumberOfTuples; ++kst)//kst st-string
                             {
                                 for (int kcl = 0; kcl < DataArray[i].NumberOfComponents; ++kcl)//kcl cl-columm
@@ -271,25 +305,41 @@ namespace SharedProject
                                 temp.Trim();
                                 temp += "\n";
                             }
+
+                            if (DataArray[i].Data.Count > 1)
+                            {
+                                VTKDataArray lookupTable = (VTKDataArray)DataArray[i].Data[1];
+                                temp += "LOOKUP_TABLE" + " " + $"{lookupTable.Name}" + " " + $"{lookupTable.NumberOfTuples}" + "\n";
+                                for (int kst = 0; kst < lookupTable.NumberOfTuples; ++kst)
+                                {
+                                    for (int kcl = 0; kcl < lookupTable.NumberOfComponents; ++kcl)
+                                    {
+                                        temp += $"{((double[,])(lookupTable.Data[0]))[kst, kcl]} ";
+                                    }
+                                    temp.Trim();
+                                    temp += "\n";
+                                }
+                            }
+
                             break;
                         }
+                    //case VTKParser.AttributeType.LOOKUP_TABLE:
+                    //    {
+                    //        temp += "LOOKUP_TABLE" + " " + $"{DataArray[i].Name}" + " " + $"{DataArray[i].NumberOfTuples}" + "\n";
+                    //        for (int kst = 0; kst < DataArray[i].NumberOfTuples; ++kst)
+                    //        {
+                    //            for (int kcl = 0; kcl < DataArray[i].NumberOfComponents; ++kcl)
+                    //            {
+                    //                temp += $"{((double[,])(DataArray[i].Data[0]))[kst, kcl]} ";
+                    //            }
+                    //            temp.Trim();
+                    //            temp += "\n";
+                    //        }
+                    //        break;
+                    //    }
                     case VTKParser.AttributeType.COLOR_SCALARS:
                         {
                             temp += "SCALARS" + " " + $"{DataArray[i].Name}" + " " + $"{DataArray[i].NumberOfComponents}" + "\n";
-                            for (int kst = 0; kst < DataArray[i].NumberOfTuples; ++kst)
-                            {
-                                for (int kcl = 0; kcl < DataArray[i].NumberOfComponents; ++kcl)
-                                {
-                                    temp += $"{((double[,])(DataArray[i].Data[0]))[kst, kcl]} ";
-                                }
-                                temp.Trim();
-                                temp += "\n";
-                            }
-                            break;
-                        }
-                    case VTKParser.AttributeType.LOOKUP_TABLE:
-                        {
-                            temp += "LOOKUP_TABLE" + " " + $"{DataArray[i].Name}" + " " + $"{DataArray[i].NumberOfTuples}" + "\n";
                             for (int kst = 0; kst < DataArray[i].NumberOfTuples; ++kst)
                             {
                                 for (int kcl = 0; kcl < DataArray[i].NumberOfComponents; ++kcl)

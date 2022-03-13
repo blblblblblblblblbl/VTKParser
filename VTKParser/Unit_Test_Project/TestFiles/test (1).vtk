@@ -59,7 +59,7 @@ CELL_TYPES 8
 12
 CELL_DATA 8
 SCALARS material int
-LOOKUP_TABLE my_table
+LOOKUP_TABLE default
 1
 1
 1
@@ -68,12 +68,3 @@ LOOKUP_TABLE my_table
 2
 2
 2
-LOOKUP_TABLE my_table 8
-0.0 0.0 0.0 1.0
-1.0 0.0 0.0 1.0
-0.0 1.0 0.0 1.0
-1.0 1.0 0.0 1.0
-0.0 0.0 1.0 1.0
-1.0 0.0 1.0 1.0
-0.0 1.0 1.0 1.0
-1.0 1.0 1.0 1.0

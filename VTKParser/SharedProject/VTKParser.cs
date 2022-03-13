@@ -196,7 +196,7 @@ namespace SharedProject
             dataset.Parse(this.raw_data_for_processing_line_format);
             this.dataset = dataset;
         }
-        protected void UntructuredGridInitialization()
+        protected void UnstructuredGridInitialization()
         {
             UnstructuredGrid dataset = new UnstructuredGrid();
             dataset.Parse(this.raw_data_for_processing_line_format);
@@ -261,7 +261,7 @@ namespace SharedProject
                     }
                 case DataSetStructure.UNSTRUCTURED_GRID:
                     {
-                        this.UntructuredGridInitialization();
+                        this.UnstructuredGridInitialization();
                         break;
                     }
                 case DataSetStructure.POLYDATA:
