@@ -65,23 +65,24 @@ namespace SharedProject
         }
         public override string StringData()
         {
+            System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
             string output = "";
             {
-                string spoints = points.Name + " " + $"{points.NumberOfTuples}" + " " + $"{points.Type}".ToLower() + "\n";
+                string spoints = points.Name + " " + $"{points.NumberOfTuples}" + " " + $"{points.Type}".ToLower() + "\r\n";
                 for (int i = 0; i < points.NumberOfTuples; ++i)
                 {
                     for (int k = 0; k < points.NumberOfComponents; k++)
                     {
                         spoints += $"{((double[,])(points.Data[0]))[i, k]} ";
                     }
-                    spoints.Trim();
-                    spoints += "\n";
+                    spoints=spoints.Trim();
+                    spoints += "\r\n";
                 }
                 output += spoints;
             }
             {
                 string scells = "";
-                scells += cells.Name + " " + $"{cells.NumberOfTuples}" + " " + $"{cells.DataSize}" + "\n";
+                scells += cells.Name + " " + $"{cells.NumberOfTuples}" + " " + $"{cells.DataSize}" + "\r\n";
                 //int number_of_componets = 0;
                 for (int i = 0; i < cells.NumberOfTuples; ++i)
                 {
@@ -89,17 +90,17 @@ namespace SharedProject
                     {
                         scells += $"{el} ";
                     }
-                    scells.Trim();
-                    scells += "\n";
+                    scells=scells.Trim();
+                    scells += "\r\n";
                 }
                 output += scells;
             }
             {
                 string scell_types = "";
-                scell_types += cell_types.Name + " " + $"{cell_types.NumberOfComponents}" + "\n";
+                scell_types += cell_types.Name + " " + $"{cell_types.NumberOfComponents}" + "\r\n";
                 foreach (int el in (int[])cell_types.Data[0])
                 {
-                    scell_types += $"{el}\n";
+                    scell_types += $"{el}\r\n";
                 }
                 output += scell_types;
             }

@@ -29,6 +29,7 @@ namespace SharedProject
         }
         public override string StringData()
         {
+            System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
             string output = "";
             {
                 string sdimensions = "";
@@ -36,19 +37,19 @@ namespace SharedProject
                 {
                     sdimensions += $"{el} ";
                 }
-                output += "DIMENSIONS " + sdimensions + "\n";
+                output += "DIMENSIONS " + sdimensions + "\r\n";
             }
             {
                 string sdata = "";
                 for (int i = 0; i < DataArray.Count; ++i)
                 {
-                    sdata += $"{DataArray[i].Name}" + " " + $"{DataArray[i].DataSize}" + " " + $"{DataArray[i].Type}".ToLower() + "\n";
+                    sdata += $"{DataArray[i].Name}" + " " + $"{DataArray[i].DataSize}" + " " + $"{DataArray[i].Type}".ToLower() + "\r\n";
                     foreach (double el in (double[])DataArray[i].Data[0])
                     {
                         sdata += $"{el} ";
                     }
-                    sdata.Trim();
-                    sdata += "\n";
+                    sdata=sdata.Trim();
+                    sdata += "\r\n";
                 }
                 output += sdata;
             }

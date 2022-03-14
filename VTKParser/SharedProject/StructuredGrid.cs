@@ -110,6 +110,7 @@ namespace SharedProject
         }
         public override string StringData()
         {
+            System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
             string output = "";
             {
                 string sdimensions = "";
@@ -117,18 +118,18 @@ namespace SharedProject
                 {
                     sdimensions += $"{el} ";
                 }
-                output += "DIMENSIONS " + sdimensions + "\n";
+                output += "DIMENSIONS " + sdimensions + "\r\n";
             }
 
-            output += points.Name + " " + $"{points.NumberOfTuples}" + " " + $"{points.Type}".ToLower() + "\n";
+            output += points.Name + " " + $"{points.NumberOfTuples}" + " " + $"{points.Type}".ToLower() + "\r\n";
             for (int i = 0; i < points.NumberOfTuples; ++i)
             {
                 for (int k = 0; k < Dimensions.Length; k++)
                 {
                     output += $"{((double[,])(points.Data[0]))[i, k]} ";
                 }
-                output.Trim();
-                output += "\n";
+                output=output.Trim();
+                output += "\r\n";
             }
 
             return output;

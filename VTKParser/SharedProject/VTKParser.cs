@@ -138,7 +138,7 @@ namespace SharedProject
             {
                 //base.CheckOnRead(filepath);
                 //base.Read(filepath);
-                using (FileStream stream = new FileStream(filepath, FileMode.OpenOrCreate))
+                using (FileStream stream = new FileStream(filepath, FileMode.Truncate/*OpenOrCreate*/))
                 {
                     byte[] array = System.Text.Encoding.Default.GetBytes(this.outputData);
                     stream.Write(array, 0, array.Length);
@@ -282,7 +282,7 @@ namespace SharedProject
         {
             this.DataFormat();
             const int file_info_lines = 4;
-            string[] raw_data_line_format = this.rawData.Split(new char[] { '\n' });
+            string[] raw_data_line_format = this.rawData.Split(new char[] { '\n','\r' }, StringSplitOptions.RemoveEmptyEntries);
             int attribute_line = raw_data_line_format.Length - 1;
             for (int i = 0; i < raw_data_line_format.Length; ++i)
             {
@@ -313,7 +313,7 @@ namespace SharedProject
         public string FileInfo()
         {
             string output = "";
-            output += this.header + this.title + this.SaveFormatType + "\n" + this.SetStructureType + "\n";
+            output += this.header + "\r\n" + this.title + "\r\n" + this.SaveFormatType + "\r\n" + "DATASET "+this.SetStructureType + "\r\n";
             return output;
         }
         public void Output(string FilePathW)

@@ -5,3 +5,10 @@ C:\Users\stitc\Documents\GitHub\VTKParser\VTKParser\Unit_Test_Project\obj\Debug\
 C:\Users\stitc\Documents\GitHub\VTKParser\VTKParser\Unit_Test_Project\obj\Debug\Unit_Test_Project.csproj.CoreCompileInputs.cache
 C:\Users\stitc\Documents\GitHub\VTKParser\VTKParser\Unit_Test_Project\obj\Debug\Unit_Test_Project.exe
 C:\Users\stitc\Documents\GitHub\VTKParser\VTKParser\Unit_Test_Project\obj\Debug\Unit_Test_Project.pdb
+C:\Users\stitc\Documents\VTKParser\VTKParser\Unit_Test_Project\bin\Debug\Unit_Test_Project.exe.config
+C:\Users\stitc\Documents\VTKParser\VTKParser\Unit_Test_Project\bin\Debug\Unit_Test_Project.exe
+C:\Users\stitc\Documents\VTKParser\VTKParser\Unit_Test_Project\bin\Debug\Unit_Test_Project.pdb
+C:\Users\stitc\Documents\VTKParser\VTKParser\Unit_Test_Project\obj\Debug\Unit_Test_Project.csproj.AssemblyReference.cache
+C:\Users\stitc\Documents\VTKParser\VTKParser\Unit_Test_Project\obj\Debug\Unit_Test_Project.csproj.CoreCompileInputs.cache
+C:\Users\stitc\Documents\VTKParser\VTKParser\Unit_Test_Project\obj\Debug\Unit_Test_Project.exe
+C:\Users\stitc\Documents\VTKParser\VTKParser\Unit_Test_Project\obj\Debug\Unit_Test_Project.pdb

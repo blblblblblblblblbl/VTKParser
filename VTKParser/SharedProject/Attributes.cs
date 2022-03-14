@@ -10,11 +10,15 @@ namespace SharedProject
         //string field_name;
         //int field_num_arrays;
         private List<VTKDataArray> DataArray = new List<VTKDataArray>();
+        public string Name { get; set; }
+        public int NumberOfTuples { get; set; }
+
         public void Parse(string[] data)
         {
             int linecounter = 1;
             VTKDataArray temp;
-            int NumberOfTuples = Convert.ToInt32(data[0].Split(' ')[1]);
+            Name = data[0].Split(' ')[0];
+            NumberOfTuples = Convert.ToInt32(data[0].Split(' ')[1]);
             while (linecounter < data.Length)
             {
                 switch ((VTKParser.AttributeType)Enum.Parse(typeof(VTKParser.AttributeType), data[linecounter].Split(' ')[0]))
@@ -275,8 +279,10 @@ namespace SharedProject
         }
         public string StringData()
         {
+            System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
             string output = "";
             string temp;
+            output += $"{Name} {NumberOfTuples}\r\n";
             for (int i = 0; i < DataArray.Count; ++i)
             {
                 temp = "";
@@ -285,15 +291,15 @@ namespace SharedProject
                 {
                     case VTKParser.AttributeType.SCALARS:
                         {
-                            string NumberOfComponents = DataArray[i].NumberOfComponents == 1 ? "" : $"{DataArray[i].NumberOfComponents}";
-                            temp += "SCALARS" + " " + $"{DataArray[i].Name}" + " " + $"{DataArray[i].Type} ".ToLower() + NumberOfComponents + "\n";
+                            string NumberOfComponents = DataArray[i].NumberOfComponents == 1 ? "" : $" {DataArray[i].NumberOfComponents}";
+                            temp += "SCALARS" + " " + $"{DataArray[i].Name}" + " " + $"{DataArray[i].Type}".ToLower() + NumberOfComponents + "\r\n";
                             if (DataArray[i].Data.Count > 1)
                             {
-                                temp += "LOOKUP_TABLE" + " " + $"{((VTKDataArray)DataArray[i].Data[1]).Name}" + "\n";
+                                temp += "LOOKUP_TABLE" + " " + $"{((VTKDataArray)DataArray[i].Data[1]).Name}" + "\r\n";
                             }
                             else
                             {
-                                temp += "LOOKUP_TABLE" + " " + "default" + "\n";
+                                temp += "LOOKUP_TABLE" + " " + "default" + "\r\n";
                             }
 
                             for (int kst = 0; kst < DataArray[i].NumberOfTuples; ++kst)//kst st-string
@@ -302,22 +308,22 @@ namespace SharedProject
                                 {
                                     temp += $"{((double[,])(DataArray[i].Data[0]))[kst, kcl]} ";
                                 }
-                                temp.Trim();
-                                temp += "\n";
+                                temp = temp.Trim();
+                                temp += "\r\n";
                             }
 
                             if (DataArray[i].Data.Count > 1)
                             {
                                 VTKDataArray lookupTable = (VTKDataArray)DataArray[i].Data[1];
-                                temp += "LOOKUP_TABLE" + " " + $"{lookupTable.Name}" + " " + $"{lookupTable.NumberOfTuples}" + "\n";
+                                temp += "LOOKUP_TABLE" + " " + $"{lookupTable.Name}" + " " + $"{lookupTable.NumberOfTuples}" + "\r\n";
                                 for (int kst = 0; kst < lookupTable.NumberOfTuples; ++kst)
                                 {
                                     for (int kcl = 0; kcl < lookupTable.NumberOfComponents; ++kcl)
                                     {
                                         temp += $"{((double[,])(lookupTable.Data[0]))[kst, kcl]} ";
                                     }
-                                    temp.Trim();
-                                    temp += "\n";
+                                    temp = temp.Trim();
+                                    temp += "\r\n";
                                 }
                             }
 
@@ -325,77 +331,77 @@ namespace SharedProject
                         }
                     //case VTKParser.AttributeType.LOOKUP_TABLE:
                     //    {
-                    //        temp += "LOOKUP_TABLE" + " " + $"{DataArray[i].Name}" + " " + $"{DataArray[i].NumberOfTuples}" + "\n";
+                    //        temp += "LOOKUP_TABLE" + " " + $"{DataArray[i].Name}" + " " + $"{DataArray[i].NumberOfTuples}" + "\r\n";
                     //        for (int kst = 0; kst < DataArray[i].NumberOfTuples; ++kst)
                     //        {
                     //            for (int kcl = 0; kcl < DataArray[i].NumberOfComponents; ++kcl)
                     //            {
                     //                temp += $"{((double[,])(DataArray[i].Data[0]))[kst, kcl]} ";
                     //            }
-                    //            temp.Trim();
-                    //            temp += "\n";
+                    //            temp = temp.Trim();
+                    //            temp += "\r\n";
                     //        }
                     //        break;
                     //    }
                     case VTKParser.AttributeType.COLOR_SCALARS:
                         {
-                            temp += "SCALARS" + " " + $"{DataArray[i].Name}" + " " + $"{DataArray[i].NumberOfComponents}" + "\n";
+                            temp += "SCALARS" + " " + $"{DataArray[i].Name}" + " " + $"{DataArray[i].NumberOfComponents}" + "\r\n";
                             for (int kst = 0; kst < DataArray[i].NumberOfTuples; ++kst)
                             {
                                 for (int kcl = 0; kcl < DataArray[i].NumberOfComponents; ++kcl)
                                 {
                                     temp += $"{((double[,])(DataArray[i].Data[0]))[kst, kcl]} ";
                                 }
-                                temp.Trim();
-                                temp += "\n";
+                                temp = temp.Trim();
+                                temp += "\r\n";
                             }
                             break;
                         }
                     case VTKParser.AttributeType.VECTORS:
                         {
-                            temp += "VECTORS" + " " + $"{DataArray[i].Name}" + " " + $"{DataArray[i].Type}".ToLower() + "\n";
+                            temp += "VECTORS" + " " + $"{DataArray[i].Name}" + " " + $"{DataArray[i].Type}".ToLower() + "\r\n";
                             for (int kst = 0; kst < DataArray[i].NumberOfTuples; ++kst)
                             {
                                 for (int kcl = 0; kcl < DataArray[i].NumberOfComponents; ++kcl)
                                 {
                                     temp += $"{((double[,])(DataArray[i].Data[0]))[kst, kcl]} ";
                                 }
-                                temp.Trim();
-                                temp += "\n";
+                                temp = temp.Trim();
+                                temp += "\r\n";
                             }
                             break;
                         }
                     case VTKParser.AttributeType.NORMALS:
                         {
-                            temp += "NORMALS" + " " + $"{DataArray[i].Name}" + " " + $"{DataArray[i].Type}".ToLower() + "\n";
+                            temp += "NORMALS" + " " + $"{DataArray[i].Name}" + " " + $"{DataArray[i].Type}".ToLower() + "\r\n";
                             for (int kst = 0; kst < DataArray[i].NumberOfTuples; ++kst)
                             {
                                 for (int kcl = 0; kcl < DataArray[i].NumberOfComponents; ++kcl)
                                 {
                                     temp += $"{((double[,])(DataArray[i].Data[0]))[kst, kcl]} ";
                                 }
-                                temp.Trim();
-                                temp += "\n";
+                                temp = temp.Trim();
+                                temp += "\r\n";
                             }
                             break;
                         }
                     case VTKParser.AttributeType.TEXTURE_COORDINATES:
                         {
-                            temp += "TEXTURE_COORDINATES" + " " + $"{DataArray[i].Name}" + " " + $"{DataArray[i].NumberOfComponents}" + " " + $"{DataArray[i].Type}".ToLower() + "\n";
+                            temp += "TEXTURE_COORDINATES" + " " + $"{DataArray[i].Name}" + " " + $"{DataArray[i].NumberOfComponents}" + " " + $"{DataArray[i].Type}".ToLower() + "\r\n";
                             for (int kst = 0; kst < DataArray[i].NumberOfTuples; ++kst)
                             {
                                 for (int kcl = 0; kcl < DataArray[i].NumberOfComponents; ++kcl)
                                 {
                                     temp += $"{((double[,])(DataArray[i].Data[0]))[kst, kcl]} ";
                                 }
-                                temp.Trim();
-                                temp += "\n";
+                                temp = temp.Trim();
+                                temp += "\r\n";
                             }
                             break;
                         }
                     case VTKParser.AttributeType.TENSORS:
                         {
-                            temp += "TENSORS" + " " + $"{DataArray[i].Name}" + " " + $"{DataArray[i].Type}".ToLower() + "\n";
+                            temp += "TENSORS" + " " + $"{DataArray[i].Name}" + " " + $"{DataArray[i].Type}".ToLower() + "\r\n";
                             for (int k = 0; k < DataArray[i].Data.Count; ++k)
                             {
                                 for (int kst = 0; kst < DataArray[i].DataSize; ++kst)
@@ -404,28 +410,28 @@ namespace SharedProject
                                     {
                                         temp += $"{((double[,])(DataArray[i].Data[k]))[kst, kcl]} ";
                                     }
-                                    temp.Trim();
-                                    temp += "\n";
+                                    temp = temp.Trim();
+                                    temp += "\r\n";
                                 }
-                                //temp += "\n";
+                                //temp += "\r\n";
                             }
                             break;
                         }
                     case VTKParser.AttributeType.FIELD:
                         {
-                            temp += $"{attributeType} " + $"{DataArray[i].Name} " + $"{DataArray[i].DataSize}\n";
+                            temp += $"{attributeType} " + $"{DataArray[i].Name} " + $"{DataArray[i].DataSize}\r\n";
                             List<VTKDataArray> field_list = (List<VTKDataArray>)(DataArray[i].Data[0]);
                             for (int j = 0; j < DataArray[i].DataSize; ++j)
                             {
-                                temp += $"{field_list[j].Name} " + $"{field_list[j].NumberOfComponents} " + $"{field_list[j].NumberOfTuples} " + $"{field_list[j].Type}\n".ToLower();
+                                temp += $"{field_list[j].Name} " + $"{field_list[j].NumberOfComponents} " + $"{field_list[j].NumberOfTuples} " + $"{field_list[j].Type}\r\n".ToLower();
                                 for (int kst = 0; kst < field_list[j].NumberOfTuples; ++kst)
                                 {
                                     for (int kcl = 0; kcl < field_list[j].NumberOfComponents; ++kcl)
                                     {
                                         temp += $"{((double[,])(field_list[j].Data[0]))[kst, kcl]} ";
                                     }
-                                    temp.Trim();
-                                    temp += "\n";
+                                    temp = temp.Trim();
+                                    temp += "\r\n";
                                 }
                             }
                             break;

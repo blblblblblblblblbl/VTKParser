@@ -20,7 +20,7 @@ namespace SharedProject
             if (data[linecounter].StartsWith("ASPECT_RATIO"))
             {
                 this.Spacing = VTKParser.StringToNumbersParse<int>(data[linecounter], "ASPECT_RATIO");//, out aspect_ratio);
-                this.SpacingName = "ASPECT_RATIO ";
+                this.SpacingName = "ASPECT_RATIO";
             }
             else
             {
@@ -29,6 +29,7 @@ namespace SharedProject
         }
         public override string StringData()
         {
+            System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
             string output = "";
             {
                 string sdimensions = "";
@@ -36,7 +37,9 @@ namespace SharedProject
                 {
                     sdimensions += $"{el} ";
                 }
-                output += "DIMENSIONS " + sdimensions + "\n";
+
+                sdimensions = sdimensions.Trim();
+                output += "DIMENSIONS " + sdimensions + "\r\n";
             }
             {
                 string sorigin = "";
@@ -44,7 +47,9 @@ namespace SharedProject
                 {
                     sorigin += $"{el} ";
                 }
-                output += "ORIGIN " + sorigin + "\n";
+
+                sorigin = sorigin.Trim();
+                output += "ORIGIN " + sorigin + "\r\n";
             }
             {
                 string sspacing = "";
@@ -52,7 +57,9 @@ namespace SharedProject
                 {
                     sspacing += $"{el} ";
                 }
-                output += $"{this.SpacingName} " + sspacing + "\n";
+
+                sspacing = sspacing.Trim();
+                output += $"{this.SpacingName} " + sspacing + "\r\n";
             }
             return output;
         }

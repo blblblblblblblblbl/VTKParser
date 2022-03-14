@@ -12,12 +12,14 @@ namespace Unit_Test_Project
     {
         static void Main(string[] args)
         {
-            for (int i = 1; i < 17; ++i)
+            for (int i = 17; i < 18; ++i)
             {
-                string FilePathR = $"C://Users//stitc//Documents//GitHub//VTKParser//VTKParser//Unit_Test_Project//TestFiles//test ({i}).vtk";
-                string FilePathW = $"C://Users//stitc//Documents//GitHub//VTKParser//VTKParser//Unit_Test_Project//TestFiles//output{i}.txt";
+                // string FilePathR = $"C://Users//stitc//Documents//GitHub//VTKParser//VTKParser//Unit_Test_Project//TestFiles//test ({i}).vtk";
+                //string FilePathW = $"C://Users//stitc//Documents//GitHub//VTKParser//VTKParser//Unit_Test_Project//TestFiles//output{i}.txt";
                 //string FilePathR = "C://Users//stitc//Documents//VTKParser//VTKParser//examples//beam-hex.vtk";
                 //string FilePathW = "C://Users//stitc//Documents//VTKParser//VTKParser//examples//test.txt";
+                string FilePathR = $"C://Users//stitc//Documents//VTKParser//VTKParser//Unit_Test_Project//TestFiles//test ({i}).vtk";
+                string FilePathW = $"C://Users//stitc//Documents//VTKParser//VTKParser//Unit_Test_Project//TestFiles//output{i}.txt";
                 VTKParser parser = new VTKParser();
                 parser.Read(FilePathR);
                 parser.RawDataProcess();
@@ -28,11 +30,12 @@ namespace Unit_Test_Project
             string outdata;
             string infilepath;
             string outfilepath;
-            for (int i = 1; i < 17; ++i)
+            for (int i = 17; i < 18; ++i)
             {
-
-                infilepath = $"C://Users//stitc//Documents//GitHub//VTKParser//VTKParser//Unit_Test_Project//TestFiles//test ({i}).vtk"; 
-                outfilepath = $"C://Users//stitc//Documents//GitHub//VTKParser//VTKParser//Unit_Test_Project//TestFiles//output{i}.txt"; 
+                //infilepath = $"C://Users//stitc//Documents//GitHub//VTKParser//VTKParser//Unit_Test_Project//TestFiles//test ({i}).vtk"; 
+                //outfilepath = $"C://Users//stitc//Documents//GitHub//VTKParser//VTKParser//Unit_Test_Project//TestFiles//output{i}.txt"; 
+                infilepath = $"C://Users//stitc//Documents//VTKParser//VTKParser//Unit_Test_Project//TestFiles//test ({i}).vtk";
+                outfilepath = $"C://Users//stitc//Documents//VTKParser//VTKParser//Unit_Test_Project//TestFiles//output{i}.txt";
                 using (FileStream stream = File.OpenRead(infilepath))
                 {
                     byte[] array = new byte[stream.Length];

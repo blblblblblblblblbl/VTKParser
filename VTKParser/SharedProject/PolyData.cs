@@ -53,17 +53,18 @@ namespace SharedProject
         }
         public override string StringData()
         {
+            System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
             string output = "";
             {
-                string spoints = points.Name + " " + $"{points.NumberOfTuples}" + " " + $"{points.Type}".ToLower() + "\n";
+                string spoints = points.Name + " " + $"{points.NumberOfTuples}" + " " + $"{points.Type}".ToLower() + "\r\n";
                 for (int i = 0; i < points.NumberOfTuples; ++i)
                 {
                     for (int k = 0; k < points.NumberOfComponents; k++)
                     {
                         spoints += $"{((double[,])(points.Data[0]))[i, k]} ";
                     }
-                    spoints.Trim();
-                    spoints += "\n";
+                    spoints=spoints.Trim();
+                    spoints += "\r\n";
                 }
                 output += spoints;
             }
@@ -72,15 +73,15 @@ namespace SharedProject
                 int length = DataArray.Count;
                 for (int i = 0; i < length; ++i)
                 {
-                    stemp += DataArray[i].Name + " " + DataArray[i].NumberOfTuples + " " + DataArray[i].DataSize + "\n";
+                    stemp += DataArray[i].Name + " " + DataArray[i].NumberOfTuples + " " + DataArray[i].DataSize + "\r\n";
                     for (int k = 0; k < DataArray[i].NumberOfTuples; ++k)
                     {
                         foreach (double el in ((double[][])(DataArray[i].Data[0]))[k])
                         {
                             stemp += $"{el} ";
                         }
-                        stemp.Trim();
-                        stemp += "\n";
+                        stemp=stemp.Trim();
+                        stemp += "\r\n";
                     }
                     output += stemp;
                 }
