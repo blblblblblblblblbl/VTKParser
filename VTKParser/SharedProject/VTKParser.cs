@@ -100,9 +100,11 @@ namespace SharedProject
         protected string rawData;
         protected string[] raw_data_file_info_line_format;
         protected string[] raw_data_for_processing_line_format;
-        protected string[] raw_data_attribute_line_format;
+        //protected string[] raw_data_attribute_line_format;
+        protected List<string[]> raw_data_attribute_line_format = new List<string[]>();
         DataSet dataset;
-        Attributes attributes;
+        private List<Attributes> attributesList = new List<Attributes>();
+        //Attributes attributes;
 
         protected string outputData;
         public List<VTKDataArray> DataArray { get; set; }
@@ -218,9 +220,16 @@ namespace SharedProject
         }
         protected void AttributeProcess()
         {
-            Attributes attributes = new Attributes();
-            attributes.Parse(this.raw_data_attribute_line_format);
-            this.attributes = attributes;
+            for (int i = 0; i < raw_data_attribute_line_format.Count; ++i)
+            {
+                Attributes attributes = new Attributes();
+                attributes.Parse(this.raw_data_attribute_line_format[i]);
+                this.attributesList.Add(attributes);
+            }
+
+            //Attributes attributes = new Attributes();
+            //attributes.Parse(this.raw_data_attribute_line_format);
+            //this.attributes = attributes;
         }
         protected void FileInfoProcess()
         {
@@ -283,24 +292,53 @@ namespace SharedProject
             this.DataFormat();
             const int file_info_lines = 4;
             string[] raw_data_line_format = this.rawData.Split(new char[] { '\n','\r' }, StringSplitOptions.RemoveEmptyEntries);
-            int attribute_line = raw_data_line_format.Length - 1;
+            //int attribute_line = raw_data_line_format.Length - 1;
+            List<int> attribute_line = new List<int>();
+            //attribute_line.Add(raw_data_line_format.Length - 1);
             for (int i = 0; i < raw_data_line_format.Length; ++i)
             {
                 if (raw_data_line_format[i].StartsWith("POINT_DATA") || raw_data_line_format[i].StartsWith("CELL_DATA"))
                 {
-                    attribute_line = i;
-                    break;
+                    attribute_line.Add(i);
+                    //attributesList.Add(new Attributes());
+                    //break;
                 }
             }
 
             this.raw_data_file_info_line_format = new string[file_info_lines];
-            this.raw_data_attribute_line_format = new string[raw_data_line_format.Length - attribute_line];
-            this.raw_data_for_processing_line_format = new string[raw_data_line_format.Length - this.raw_data_attribute_line_format.Length - this.raw_data_file_info_line_format.Length];
+            if (attribute_line.Count == 0)
+            {
+                this.raw_data_for_processing_line_format = new string[raw_data_line_format.Length - this.raw_data_file_info_line_format.Length];
+            }
+            else
+            {
+                this.raw_data_for_processing_line_format = new string[raw_data_line_format.Length - this.raw_data_file_info_line_format.Length-(raw_data_line_format.Length-attribute_line[0])];
+            }
+
+            //{
+            //    int temp_length = raw_data_line_format.Length - 1;
+            //    if (attribute_line.Count > 0)
+            //    {
+            //        temp_length = attribute_line[0];
+            //    }
+
+            //    this.raw_data_for_processing_line_format = new string[raw_data_line_format.Length - temp_length - this.raw_data_file_info_line_format.Length];
+            //}
 
             Array.Copy(raw_data_line_format, 0, this.raw_data_file_info_line_format, 0, this.raw_data_file_info_line_format.Length);
             Array.Copy(raw_data_line_format, file_info_lines, this.raw_data_for_processing_line_format, 0, this.raw_data_for_processing_line_format.Length);
-            Array.Copy(raw_data_line_format, attribute_line, this.raw_data_attribute_line_format, 0, this.raw_data_attribute_line_format.Length);
 
+            if (attribute_line.Count != 0)
+            {
+                for (int i = 0; i < attribute_line.Count - 1; ++i)
+                {
+                    this.raw_data_attribute_line_format.Add(new string[(attribute_line)[i + 1] - (attribute_line)[i]]);
+                    Array.Copy(raw_data_line_format, attribute_line[i], this.raw_data_attribute_line_format[i], 0, this.raw_data_attribute_line_format[i].Length);
+                }
+                this.raw_data_attribute_line_format.Add(new string[raw_data_line_format.Length - (attribute_line)[attribute_line.Count - 1]]);
+                Array.Copy(raw_data_line_format, attribute_line[attribute_line.Count - 1], this.raw_data_attribute_line_format[attribute_line.Count - 1], 0, this.raw_data_attribute_line_format[attribute_line.Count - 1].Length);
+                //Console.ReadKey();
+            }
         }
         public void RawDataProcess()
         {
@@ -318,7 +356,11 @@ namespace SharedProject
         }
         public void Output(string FilePathW)
         {
-            this.outputData = FileInfo() + dataset.StringData() + attributes.StringData();
+            this.outputData = FileInfo() + dataset.StringData();
+            for (int i = 0; i < attributesList.Count; ++i)
+            {
+                this.outputData += attributesList[i].StringData();
+            }
             Write(FilePathW);
         }
     }

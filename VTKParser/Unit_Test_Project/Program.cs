@@ -12,7 +12,7 @@ namespace Unit_Test_Project
     {
         static void Main(string[] args)
         {
-            for (int i = 17; i < 18; ++i)
+            for (int i = 1; i < 18; ++i)
             {
                 // string FilePathR = $"C://Users//stitc//Documents//GitHub//VTKParser//VTKParser//Unit_Test_Project//TestFiles//test ({i}).vtk";
                 //string FilePathW = $"C://Users//stitc//Documents//GitHub//VTKParser//VTKParser//Unit_Test_Project//TestFiles//output{i}.txt";
@@ -30,7 +30,7 @@ namespace Unit_Test_Project
             string outdata;
             string infilepath;
             string outfilepath;
-            for (int i = 17; i < 18; ++i)
+            for (int i = 1; i < 18; ++i)
             {
                 //infilepath = $"C://Users//stitc//Documents//GitHub//VTKParser//VTKParser//Unit_Test_Project//TestFiles//test ({i}).vtk"; 
                 //outfilepath = $"C://Users//stitc//Documents//GitHub//VTKParser//VTKParser//Unit_Test_Project//TestFiles//output{i}.txt"; 
@@ -49,7 +49,7 @@ namespace Unit_Test_Project
                     outdata = System.Text.Encoding.Default.GetString(array);
                 }
 
-                Console.WriteLine(String.Compare(indata,outdata));
+                Console.WriteLine(String.Compare(indata,outdata)==0);
             } 
             Console.ReadKey();
         }
