@@ -1,0 +1,7 @@
+C:\Users\stitc\Documents\VTKParser\VTKParserV2\VTKParser\VTKParserTest\bin\Debug\VTKParserTest.exe.config
+C:\Users\stitc\Documents\VTKParser\VTKParserV2\VTKParser\VTKParserTest\bin\Debug\VTKParserTest.exe
+C:\Users\stitc\Documents\VTKParser\VTKParserV2\VTKParser\VTKParserTest\bin\Debug\VTKParserTest.pdb
+C:\Users\stitc\Documents\VTKParser\VTKParserV2\VTKParser\VTKParserTest\obj\Debug\VTKParserTest.csproj.AssemblyReference.cache
+C:\Users\stitc\Documents\VTKParser\VTKParserV2\VTKParser\VTKParserTest\obj\Debug\VTKParserTest.csproj.CoreCompileInputs.cache
+C:\Users\stitc\Documents\VTKParser\VTKParserV2\VTKParser\VTKParserTest\obj\Debug\VTKParserTest.exe
+C:\Users\stitc\Documents\VTKParser\VTKParserV2\VTKParser\VTKParserTest\obj\Debug\VTKParserTest.pdb
